@@ -1,0 +1,21 @@
+=================================================================================
+|   SORTOWANIE	|   ZŁOŻONOŚĆ	|  			CZAS SOROTWANIA N ELEM. [s]			|
+| 				|				| n= 100 000	| n= 1 000 000	| n= 10 000 000 |
+=================================================================================
+| insertionSort	| O(n^2)		|	6.31128		|	637.653		|	n/c			|
+| mergeSort (r)	| O(n*log(n))	|	0.017982	|	<SFCD>		|	<SFCD>		|
+| mergeSort (i)	| O(n*log(n))	|	0.017016	|	<SFCD>		|	<SFCD>		|
+|				|				|				|				|				|
+|				|				|				|				|				|
+|				|				|				|				|				|
+|				|				|				|				|				|
+=================================================================================
+
+log(n) - logarytm naturalny o podstawie 2 z n ( log_2(n) )
+<SFCD> - Segmentation fault (core dumped)
+n/c - not checked
+
+Uwaga:
+stack size: 8192 [kbytes] (cmd: ulimit -all)
+
+ 
