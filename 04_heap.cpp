@@ -1,8 +1,6 @@
 #include <iostream>
 #include <random>
 
-// PRZYJMUJEMY NUMEROWANIE OD 1 (nieużywamy 0wego elementu)
-
 class Heap{
 private:
 
@@ -94,8 +92,6 @@ void printTable(){
 }
 
 };
-
-
 
 int main(){
 
