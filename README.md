@@ -9,8 +9,9 @@ Based on Cormen's "Introduction to algorithms".
 - insertionSort
 - mergeSort (recursive)
 - mergeSort (iterative)
+- heapSort
 ##### Data Structures:
-- *null*
+- heap
 
 ##### Folder lib:
 - timer.h - klasa minutnika do mierzenia czasu działania algorytmów
