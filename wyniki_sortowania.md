@@ -1,16 +1,16 @@
-## Czas sortowania n elementowej tablicy danych typu double
+## Sort time of the n-element data array of type double
 
-Czas w tabeli podany jest w sekundach.
-Wielkość stosu w systemie: 8192 [kb] (cmd: ulimit -all)
+Time results in table are shown in seconds.
+System stack size: 8192 [kb] (cmd: ulimit -all)
 
 
-|   SORTOWANIE				|   ZŁOŻONOŚĆ	| n = 100 000	| n = 1 000 000	| n = 10 000 000 |
+| Sorting					| Complexity	| n = 100 000	| n = 1 000 000	| n = 10 000 000 |
 |:--------------------------|:--------------|:-------------:|:-------------:|:-------------:|
 | insertionSort				| O( n^2 )		|	6.31128		|	637.653 	|	n/c			|
 | mergeSort (rekurenyjny)	| O( n*log(n) )	|	0.017982 	|	SFCD		|	SFCD		|
 | mergeSort (iteracyjny)	| O( n*log(n) )	|	0.017016 	|	SFCD		|	SFCD		|
 
-*log(n) - logarytm naturalny o podstawie 2 z n ( log_2(n) )*
+*log(n) - natural logarithm of base 2 of n*
 *SFCD - Segmentation fault (core dumped)*
-*n/c - nie sprawdzane*
+*n/c - not checked*
 

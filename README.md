@@ -1,13 +1,20 @@
 # myAiSD
 
 My implementations of some basic algorithrms and data structures.
-Based on my AiSD course.
+Based on Cormen's "Introduction to algorithms".
 
-## Content:
+### Content:
 
-### Sorting:
+##### Sorting:
 - insertionSort
 - mergeSort (recursive)
 - mergeSort (iterative)
-- 
-### Data Structures:
+##### Data Structures:
+- *null*
+
+##### Folder lib:
+- timer.h - klasa minutnika do mierzenia czasu działania algorytmów
+- tables.h, tables.cpp - funkcje pomocnicze do pracy z tablicami
+	- insertRandom - wypełnianie tablicy losowymi wartościami
+	- printTable - wyświetlanie zawartości tablicy
+	- checkTable - sprawdzanie posortowania tablicy

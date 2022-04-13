@@ -3,6 +3,12 @@
 
 #include <iostream>
 
+// CLASS TIMER
+// METHODS:
+//	START() - start (and reset) timer
+//	STOP() - stops timer
+//	PRINT() - prints clocked time (in [ms], [s] and [min]) 
+ 
 class Timer{
 	clock_t s,e;
 	double duration;
