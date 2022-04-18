@@ -4,7 +4,7 @@
 class Heap{
 private:
 
-double A[1000+1];
+double A[1000+1]; // tutaj zrobić std::vector
 int _max_size=1000; // wielkość tablicy (bez pierwszego elementu)
 
 int _size; // wielkość kopca 
