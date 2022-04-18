@@ -11,7 +11,7 @@ Based on Cormen's "Introduction to algorithms".
 - mergeSort (iterative)
 - heapSort
 ##### Data Structures:
-- maxHeap (only buildHeap and heapify)
+- maxHeap
 
 ##### Folder lib:
 - timer.h - klasa minutnika do mierzenia czasu działania algorytmów
