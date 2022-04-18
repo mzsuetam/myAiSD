@@ -90,6 +90,7 @@ void heapSort(double tab[], int n){
 
 	// sortujemy 
 	heap->sort();
+	
 	// usuwamy zbędną strukturę
 	delete heap;
 }
