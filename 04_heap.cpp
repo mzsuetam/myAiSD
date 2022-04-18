@@ -1,11 +1,11 @@
 #include <iostream>
 #include <random>
+#include <vector>
 
 class Heap{
 private:
 
-double A[1000+1]; // tutaj zrobić std::vector
-int _max_size=1000; // wielkość tablicy (bez pierwszego elementu)
+std::vector<double> A;
 
 int _size; // wielkość kopca 
 // uwaga! kopiec nie korzysta z indeksu 0, tablica jest przesunięta o 1 w prawo 
@@ -19,8 +19,10 @@ int _right(int ind){ return ind*2+1; } //indeks rodzica*2+1 to prawe dziecko
 
 public:
 
+Heap(){ A.push_back(static_cast<double>(NULL)); }
+~Heap(){}
+
 int getSize(){ return _size; }
-int getMaxSize(){ return _max_size; }
 
 void heapify(int i){
 	// podajemy indeks elementu, który razem z dziećmi nie zachowuje własności kopca,
@@ -53,12 +55,22 @@ void heapify(int i){
 void buildHeap(double tab[], int n){
 	// zapisujemy wielkość tablicy
 	_size=n;
+
 	// przepisujemy to przetrzymywanej tablicy wartości z zadanej
 	for (int i=1; i<_size+1; i++){
-		A[i] = tab[i-1];
+		A.push_back(tab[i-1]);
 	}
 	// budujemy z niej kopiec
-	for (int i=n/2; i > 0; i--){
+	for (int i=_size/2; i > 0; i--){
+		heapify(i);
+	}
+}
+
+void insert(double val){
+	A.push_back(val);
+	_size++;
+	// naprawiamy kopiec
+	for (int i=_size/2; i > 0; i--){
 		heapify(i);
 	}
 }
@@ -69,10 +81,18 @@ void printHeap(){
 
 	for (int i = 1; i < _size+1; i++) {
 		int level = log2(i) + 1;
-		int spaces = (height - level + 1) * 2;
+		int spaces = pow(2,(height - level + 1));
+		if ( level > 4 ) spaces *=2;
 
-		for (int j=0; j<spaces; j++){
-			std::cout << " ";
+		if (((int)pow(2, level-1)+(int)pow(2, level))/2 == i) {
+			for (int j=0; j<spaces/2+(height-level)*2; j++){
+				std::cout << " ";
+			}
+		}
+		else{
+			for (int j=0; j<spaces; j++){
+				std::cout << " ";
+			}	
 		}
 		std::cout << A[i];
 
@@ -93,16 +113,23 @@ void printTable(){
 
 };
 
+///////////////////////////////////////////////////////////////////////////////////
+
 int main(){
 
-	int n=10;
-	double tab1[n] = {5,1,2,3,4,0,6,7,8,9};
+	int n=13;
+	double tab1[n] = {5,1,2,3,4,0,6,2,5,3,2,8,9};
 	
 	Heap* heap1 = new Heap;
 
 	heap1->buildHeap(tab1, n);
 
-	heap1->printTable();
+	//heap1->printTable();
+	//heap1->printHeap();
+
+	heap1->insert(1);
+	heap1->insert(0);
+
 	heap1->printHeap();
 
 
