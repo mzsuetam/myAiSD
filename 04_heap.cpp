@@ -11,18 +11,19 @@ int _size; // wielkość kopca
 // uwaga! kopiec nie korzysta z indeksu 0, tablica jest przesunięta o 1 w prawo 
 
 
-int _parent(int ind){ return ind/2; } // podłoga z indeksu dziecka/2 to rodzic
+int _parent(int ind){ return ind/2-1; } // podłoga z indeksu dziecka/2 to rodzic przy numeracji od 1 (przesunięcie o 1 bo 0)
 
-int _left(int ind){	return ind*2; } //indeks rodzica*2 to lewe dziecko
+int _left(int ind){	return ind*2+1; } // lewe dziecko to 2*indeks_rodzica przy numeracji od 1 (przesunięcie o 1 bo 0)
 
-int _right(int ind){ return ind*2+1; } //indeks rodzica*2+1 to prawe dziecko
+int _right(int ind){ return ind*2+2; } // prawe dziecko to 2*indeks_rodzica+1 przy numeracji od 1 (przesunięcie o 1 bo 0)
 
 public:
 
-Heap(){ A.push_back(static_cast<double>(NULL)); }
+Heap(){}
 ~Heap(){}
 
 int getSize(){ return _size; }
+void printSize(){ std::cout << "Size: " << _size << std::endl; }
 
 void heapify(int i){
 	// podajemy indeks elementu, który razem z dziećmi nie zachowuje własności kopca,
@@ -57,11 +58,11 @@ void buildHeap(double tab[], int n){
 	_size=n;
 
 	// przepisujemy to przetrzymywanej tablicy wartości z zadanej
-	for (int i=1; i<_size+1; i++){
-		A.push_back(tab[i-1]);
+	for (int i=0; i<_size; i++){
+		A.push_back(tab[i]);
 	}
 	// budujemy z niej kopiec
-	for (int i=_size/2; i > 0; i--){
+	for (int i=_size/2; i >= 0; i--){
 		heapify(i);
 	}
 }
@@ -70,7 +71,7 @@ void insert(double val){
 	A.push_back(val);
 	_size++;
 	// naprawiamy kopiec
-	for (int i=_size/2; i > 0; i--){
+	for (int i=_size/2; i >= 0; i--){
 		heapify(i);
 	}
 }
@@ -94,18 +95,21 @@ void printHeap(){
 				std::cout << " ";
 			}	
 		}
-		std::cout << A[i];
+		std::cout << A[i-1];
+
+		if ( i%2 ){
+			std::cout << "|";
+		}
 
 		if ((int)pow(2, level) - 1 == i) {
 			std::cout << std::endl;
 		}
 	}
-	std::cout << std::endl;
 }
 
 void printTable(){
 	// o, to sam napisałem XD
-	for (int i=1; i<_size+1; i++){
+	for (int i=0; i<_size; i++){
 		std::cout << A[i] << " ";
 	}
 	std::cout << std::endl;
@@ -130,9 +134,10 @@ int main(){
 	heap1->insert(1);
 	heap1->insert(0);
 
+	heap1->printTable();
 	heap1->printHeap();
 
-
+	heap1->printSize();
 
 	return 0;
 }
