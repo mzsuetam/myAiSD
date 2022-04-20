@@ -12,6 +12,7 @@ Based on Cormen's "Introduction to algorithms".
 - heapSort
 ##### Data Structures:
 - maxHeap
+- priorityQueue
 
 ##### Folder lib:
 - timer.h - klasa minutnika do mierzenia czasu działania algorytmów

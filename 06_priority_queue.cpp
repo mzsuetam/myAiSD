@@ -2,10 +2,19 @@
 #include <random>
 #include <vector>
 
-class MaxHeap{
+
+class PriorityQueue{
+// PriorityQueue bazuje na MaxHeap ponieważ A[0] zawsze daje nam element o najwyższej wartości 
 private:
 
-std::vector<double> A;
+struct Elem{
+	Elem(double _val, int _key):val(_val),key(_key){}
+
+	double val;
+	int key;
+};
+
+std::vector<Elem> S;
 
 int _size;
 
@@ -24,18 +33,21 @@ void _heapify(int ind){
 	int r = _right(ind);
 
 	// decydujemy, która z wartości (rodzic, prawy potomek, lewy potomek) jest największa (przy okazji czy nie wychodzą poza wiekość)
-	if ( ( l <= _size-1 ) && ( A[l] > A[largest]) ){ // nie >= bo nie chemy zamieniać specjalnie jak nie trzeba
+	if ( ( l <= _size-1 ) && ( S[l].key > S[largest].key ) ){ // nie >= bo nie chemy zamieniać jak było inaczej dodane do kolejki
 		largest=l;
 	}
-	if ( ( r <= _size-1 ) && ( A[r] > A[largest] ) ){
+	if ( ( r <= _size-1 ) && ( S[r].key > S[largest].key ) ){
 		largest=r;
 	}
 
 	// jeżeli największy nie jest rodzicem, to zamieniamy go miejscami z rodzicem
 	if ( largest != ind ){
-		double tmp = A[ind];
-		A[ind] = A[largest];
-		A[largest] = tmp;
+		int tmp_k = S[ind].key;
+		double tmp_v = S[ind].val;
+		S[ind].key = S[largest].key;
+		S[ind].val = S[largest].val;
+		S[largest].key = tmp_k;
+		S[largest].val = tmp_v;
 
 		// badany węzeł zachowuje już własność kopca, ale 'spływająca' najmniejsza wartość
 		// mogła zaburzyć własność w niższym węźle, więc ją naprawiamy
@@ -45,67 +57,69 @@ void _heapify(int ind){
 
 public:
 
-MaxHeap(){ std::cout << "MaxHeap constructed (empty)." << std::endl;}
-MaxHeap(double tab[], int n){ std::cout << "MaxHeap constructed." << std::endl; buildHeap(tab,n); }
-~MaxHeap(){ std::cout << "MaxHeap destructed." << std::endl; }
+PriorityQueue(){ std::cout << "PriorityQueue constructed (empty)." << std::endl;}
+PriorityQueue(double values[], int keys[], int n){ std::cout << "PriorityQueue constructed." << std::endl; buildHeap(values, keys ,n); }
+~PriorityQueue(){ std::cout << "PriorityQueue destructed." << std::endl; }
 
-void buildHeap(double tab[], int n){
-	A.clear();
+void buildHeap(double values[], int keys[], int n){
+	S.clear();
 
 	// zapisujemy wielkość tablicy
 	_size=n;
 
 	// przepisujemy to przetrzymywanej tablicy wartości z zadanej
 	for (int i=0; i<_size; i++){
-		A.push_back(tab[i]);
+		S.push_back(Elem(values[i],keys[i]));
 	}
 	// budujemy z niej kopiec
 	for (int i=_size/2; i >= 0; i--){
 		_heapify(i);
 	}
 
-	std::cout << "MaxHeap has been builded from table." << std::endl; 
+	std::cout << "PriorityQueue has been builded from tables." << std::endl; 
 }
 
-void insert(double val){
-	A.push_back(val);
+void insert(double val, int key){
+	S.push_back(Elem(0,0));
 	_size++;
 	// przechodzimy z wartością na odpowiednie miejsce
 	int i = _size-1;
-	while ( ( i > 0 ) && ( A[_parent(i)] < val ) ){
-		A[i] = A[_parent(i)];
+	while ( ( i > 0 ) && ( S[_parent(i)].key < key ) ){
+		S[i].val = S[_parent(i)].val;
+		S[i].key = S[_parent(i)].key;
 		i = _parent(i);
 	}
-	A[i]=val;
-	// naprawiamy kopiec (to rozwiązanie jest gorsze od powyższego)
-	// for (int i=_size/2; i >= 0; i--){
-	// 	_heapify(i);
-	// }
+	S[i].val=val;
+	S[i].key=key;
 
-	std::cout << "Value " << val << " has been added." << std::endl; 
-}
-
-void erase(int ind){
-	// to chyba nie jest najbardziej optymalny sposób
-
-	if ( ( 0 <= ind ) && ( ind < _size ) ){
-		std::cout << "Value under index " << ind << " (" << A[ind] << ") has been deleted." << std::endl; 
-
-		A[ind] = A[_size-1];
-		A.pop_back();
-		// naprawiamy kopiec
-		_heapify(ind);
-	}
-	else std::cout << "No such index in MaxHeap!" << std::endl;
+	std::cout << "Value " << val << " (key: " << key << ") has been added." << std::endl; 
 }
 
 int getSize(){ return _size; }
 
 double getMax() {
 	if ( _size > 0 ){
-		return A[0]; 
+		return S[0].val; 
 	}
-	else std::cout << "MaxHeap empty!" << std::endl;
+	else std::cout << "PriorityQueue empty!" << std::endl;
+	return -1;
+}
+
+double popMax() {
+	// złożoność O( log(n) ) tylko przez _heapify
+	double max;
+	if ( _size > 0 ){
+		max = S[0].val; 
+		if ( _size > 1){
+			S[0].key = S[_size-1].key;
+			S[0].val = S[_size-1].val;
+			_heapify(0);
+		}
+		_size--;
+		S.pop_back();
+		return max;
+	}
+	else std::cout << "PriorityQueue empty!" << std::endl;
 	return -1;
 }
 
@@ -118,7 +132,7 @@ void printHeap(){
 		if ( level > 4 ) spaces *=2;
 		if (((int)pow(2, level-1)+(int)pow(2, level))/2 == i) { for (int j=0; j<spaces/2+(height-level)*2; j++){ std::cout << " "; } }
 		else{ for (int j=0; j<spaces; j++){ std::cout << " "; }	}
-		std::cout << A[i-1];
+		std::cout << S[i-1].val << "(" << S[i-1].key << ")";
 		if ( i%2 ){	std::cout << "|";}
 		if ((int)pow(2, level) - 1 == i) {std::cout << std::endl;}
 	}
@@ -133,7 +147,7 @@ void printTable(){
 		int level = log2(i) + 1;
 		int spaces = pow(2,(height - level + 1));
 		if ( level > 4 ) spaces *=2;
-		std::cout << " " << A[i-1]; if ( i%2 ){ std::cout << " |"; }
+		std::cout << " " << S[i-1].val << "(" << S[i-1].key << ")"; if ( i%2 ){ std::cout << " |"; }
 		if ((int)pow(2, level) - 1 == i) { std::cout << "|"; }
 	}
 	std::cout << std::endl;
@@ -145,29 +159,29 @@ void printTable(){
 
 int main(){
 
-	int n=13;
-	double tab1[n] = {5,1,2,3,4,0,6,2,5,3,2,8,9};
+	double values1[10] = {0,1,2,3,4,5,6,7,8,9};
+	int keys1[10]      = {8,8,4,6,5,4,2,2,0,0};
+
+	PriorityQueue* pqueue1 = new PriorityQueue(values1, keys1, 10);
+	pqueue1->printHeap();
 	
-	MaxHeap* heap1 = new MaxHeap;
+	std::cout << "Max: " << pqueue1->popMax() << std::endl;
+	pqueue1->printHeap();
+	
+	pqueue1->insert(14,8);
+	pqueue1->printHeap();
 
-	heap1->buildHeap(tab1, n);
-	heap1->printHeap();
+	pqueue1->insert(15,8);
+	pqueue1->printHeap();
 
-	heap1->insert(1);
-	heap1->insert(11);
+	std::cout << "Max: " << pqueue1->popMax() << std::endl;
+	pqueue1->printHeap();
 
-	heap1->printTable();
+	std::cout << "Max: " << pqueue1->popMax() << std::endl;
+	pqueue1->printHeap();
 
-	std::cout << "Size: " << heap1->getSize() << std::endl;
-	std::cout << "Max: " << heap1->getMax() << std::endl;
-
-	heap1->printHeap();
-
-	heap1->erase(0);
-
-	heap1->printHeap();
-
-	delete heap1;
+	delete pqueue1;
+	
 
 	return 0;
 }
