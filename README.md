@@ -10,6 +10,7 @@ Based on Cormen's "Introduction to algorithms".
 - mergeSort (recursive)
 - mergeSort (iterative)
 - heapSort
+- quickSort
 ##### Data Structures:
 - maxHeap
 - priorityQueue
