@@ -6,14 +6,21 @@ Based on Cormen's "Introduction to algorithms".
 ### Content:
 
 ##### Sorting:
-- insertionSort
-- mergeSort (recursive)
-- mergeSort (iterative)
-- heapSort
-- quickSort
+- Comparison sorts:
+	- insertionSort, [01], Cor. 1.2
+	- mergeSort (recursive), [02], Cor 1.3
+	- mergeSort (iterative), [03]
+	- heapSort, [05], Cor 7.4
+	- quickSort, [07], Cor 8
+	- quickSort (randomized), [08], Cor 8
+- Non-comparison sorts:
+	- countingSort
+	- radixSort
+	- bucketSort
+
 ##### Data Structures:
-- maxHeap
-- priorityQueue
+- maxHeap, [04], Cor 7.1-3
+- priorityQueue, [06], Cor 7.5
 
 ##### Folder lib:
 - timer.h - klasa minutnika do mierzenia czasu działania algorytmów
