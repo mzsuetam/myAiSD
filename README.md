@@ -14,8 +14,8 @@ Based on Cormen's "Introduction to algorithms".
 	- quickSort, [07], Cor 8
 	- quickSort (randomized), [08], Cor 8
 - Non-comparison sorts:
-	- countingSort
-	- radixSort
+	- countingSort [09], Cor 9.2
+	- radixSort (on countingSort) [10], Cor 9.3
 	- bucketSort
 
 ##### Data Structures:

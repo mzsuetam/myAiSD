@@ -15,7 +15,7 @@ System stack size: 8192 [kb] (cmd: ulimit -all)
 | quickSort (random)		| O( n*log(n) ) | O( n^2 )		|	0.012149	|	0.127172	| cmpr.	 | Unstable	| yes		|
 | countingSort [ int > 0 ]	| O(n+k)		| O(n+k)		|	0.001119	|	0.012347	| n-cmpr.| Stable	| no		| 
 | altCountingSort [ int ]	| O(n+k)		| O(n+k)		|	0.001181	|	0.013102	| n-cmpr.| Stable	| no		| 
-| radixSort					|				|				|				|				| n-cmpr.|			|			| 
+| radixSort (on countingSort)| O( dn+dk )	| O( dn+dk )	|	0.051841	|	0.536251	| n-cmpr.| Stable	| no		| 
 | bucketSort				|				|				|				|				| n-cmpr.|			|			| 
 
 Stability - sorts the elements of identical key in the same order as they appear in the input
@@ -24,7 +24,6 @@ In-place - sorted items occupy the same storage as the original ones.
 *Cmpx. - Complexity on*
 *cmpr. - comparison*
 *n-cmpr. - Non-comparison*
-
 *log(n) - natural logarithm of base 2 of n*
 *SFCD - Segmentation fault (core dumped)*
 *n/c - not checked*
