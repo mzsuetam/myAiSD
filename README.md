@@ -22,6 +22,7 @@ Based on Cormen's "Introduction to algorithms".
 - maxHeap, [04], Cor 7.1-3
 - priorityQueue, [06], Cor 7.5
 - stack [12], Cor 11.1
+- stack [13], Cor 11.1
 
 ##### Folder lib:
 - timer.h - klasa minutnika do mierzenia czasu działania algorytmów
