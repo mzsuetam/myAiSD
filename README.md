@@ -24,6 +24,7 @@ Based on Cormen's "Introduction to algorithms".
 - stack [12], Cor 11.1
 - queue [13], Cor 11.1
 - list [14], Cor 11.2
+- BST tree [15], Cor 13
 
 ##### Folder lib:
 - timer.h - klasa minutnika do mierzenia czasu działania algorytmów
