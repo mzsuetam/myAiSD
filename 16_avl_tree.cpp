@@ -33,7 +33,7 @@ class AVL{
 		Node():key(0),height(0),p(nullptr),left(nullptr),right(nullptr){voice();}
 		Node(int key):key(key),height(0),p(nullptr),left(nullptr),right(nullptr){voice();}
 		Node(int key, std::shared_ptr<Node> parent):key(key),height(0),p(parent),left(nullptr),right(nullptr){voice();}
-		~Node(){std::cout << "Node(" << key << ") dead" << std::endl;}
+		~Node(){/*std::cout << "Node(" << key << ") dead" << std::endl;*/}
 
 		void voice(){ std::cout << "Node(" << key << ") born" << std::endl; }
 	};
@@ -63,8 +63,12 @@ class AVL{
 			if ( z->key < x->key ){
 				x = x->left;
 			}
-			else{
+			else if (z->key > x->key){
 				x = x->right;
+			}
+			else{
+				z.reset();
+				return;
 			}
 		}
 		z->p = y;
@@ -80,25 +84,52 @@ class AVL{
 
 		_setHeight(z);
 		
-		while ( y ){
-			int l = ( y->left ) ? y->left->height : 0;
-			int r = ( y->right ) ? y->right->height : 0;
-			int weight = r-l;
-			if ( weight == -2 ){
-				//std::cout << "rR" << y->key <<std::endl;
-				x=y->left;
-				_rotateRight(y);
-				break;
-			}
-			else if ( weight == 2 ){
-				_rotateLeft(y);
-				x=y->right;
-				//std::cout << "rL" << y->key <<std::endl;
-				break;
-			}
-			y = y->p;
+		// int l = ( y->left ) ? y->left->height : 0;
+		// int r = ( y->right ) ? y->right->height : 0;
+		// int weight = r-l;
+
+		// searching critical node
+		int balance = 0;
+		std::shared_ptr<Node> c = z;
+		while ( c ){
+			int l = ( c->left ) ? c->left->height : -1;
+			int r = ( c->right ) ? c->right->height : -1;
+			balance = l-r;
+
+			if ( balance < -1 || balance > 1 ) break;			
+
+			c = c->p;
+		}
+		
+		if (c && ( balance < -1 || balance > 1)){
+			//print();
+			std::cout << c->key << ": " <<  balance << std::endl;
 		}
 
+		if ( c ) {
+// 		LL Rotation 	The new node is inserted to the left sub-tree of left sub-tree of critical node.
+			if ( balance > 1 && c->left && z->key < c->left->key ){
+				std::cout << "LL" << std::endl;
+				_rotateRight(c);
+			}
+//  	RR Rotation 	The new node is inserted to the right sub-tree of the right sub-tree of the critical node.
+			else if ( balance < -1 && c->right && z->key > c->right->key ){
+				std::cout << "RR" << std::endl;
+				_rotateLeft(c);
+			}
+//  	LR Rotation 	The new node is inserted to the right sub-tree of the left sub-tree of the critical node.
+			else if ( balance > 1 && c->left && z->key > c->left->key ){
+				std::cout << "LR" << std::endl;
+				_rotateLeft(c->left);
+				_rotateRight(c);
+			}
+//  	RL Rotation 	The new node is inserted to the left sub-tree of the right sub-tree of the critical node.
+			else if ( balance < -1 && c->right && z->key < c->right->key ){
+				std::cout << "RL" << std::endl;
+				_rotateRight(c->right);
+				_rotateLeft(c);
+			}
+		}
 	}
 
 	void DSW(){
@@ -108,8 +139,8 @@ class AVL{
 	void _setHeight(std::shared_ptr<Node> x){
 		do{
 			
-			int l = ( x->left ) ? x->left->height : 0;
-			int r = ( x->right ) ? x->right->height : 0;
+			int l = ( x->left ) ? x->left->height : -1;
+			int r = ( x->right ) ? x->right->height : -1;
 			x->height = 1 + ( ( l > r ) ? l : r );
 
 			x=x->p;
@@ -171,8 +202,15 @@ public:
 			if ( node == root) std::cout << "─R─";
 			else std::cout << (isLeft ? "├l─" : "└p─" );
 
+
+			int l = ( node->left ) ? node->left->height : -1;
+			int r = ( node->right ) ? node->right->height : -1;
+			int balance = l-r;
+
+			if ( balance < -1 || balance > 1  ) std::cout << "CHUJ BOMBKI STRZELIŁ ";
+
 			// print the value of the node
-			std::cout << node->key << "(" << node->height << ")" << std::endl;
+			std::cout << node->key << "(" << node->height << ";" << balance << ")" << std::endl;
 
 			// enter the next tree level - left and right branch
 			print( prefix + (isLeft ? "│   " : "    "), node->left, true);
@@ -183,9 +221,9 @@ public:
 
 	void createSample(){
     	srand(time(0)); 
-		for (int i=0;i<31;i++){
+		for (int i=0;i<50;i++){
 			insertNode( (rand () % 50) + 0 );
-			print();
+			//print();
 		}
 	}
 
