@@ -8,6 +8,8 @@
 #include <cstdlib>  //required for rand(), srand()
 #include <ctime>    //required for time()
 
+#include "15_bst_tree.cpp"
+
 class AVL{
 	// Drzewo AVL jest zrównoważonym drzewem BST bez duplikatów kluczy (które mogą być implementowane przez dodatkowe pole ilość w Node)
 	//	 dzięki złożoność podstawowych operacji utrzymuje się na lg(n) (bo taka jest wysokość)
@@ -132,8 +134,30 @@ private:
 		}
 	}
 
-	void DSW(){
+	void DSW(/* BST* source */){
 		// https://pl.wikipedia.org/wiki/Algorytm_DSW
+
+		// FAZA 0
+		// pasowałoby skopiować elementy dsw do avl tak jak są, bez równoważnia
+
+		// n - całkowita liczba węzłów 
+
+		// FAZA I - tworzenie kręgosłupa 
+		// tmp = korzen; //tmp to zmienna tymczasowa
+		// while tmp nie jest równe NULL
+		// 	if tmp posiada lewego potomka
+		// 		wykonaj rotację tego potomka względem tmp; //Czyli lewy potomek zostaje ojcem węzła tmp
+		// 		tmp zostaje przesunięty do nowo powstałego rodzica;
+		// 	else
+		// 		tmp zostaje przesunięty w miejsce swojego prawego potomka;
+
+		// FAZA II - tworzneie AVL
+		// m = 2^[log_2(n+1)-1]; / [x] oznacza funkcję entier – największą liczbę całkowitą, nie większą od x
+		// wykonaj n-m rotacji, idąc od początku linii po prawych potomkach;
+		// while m > 1
+		// 	m = [m/2]; // znaczenie nawiasów [] jak wyżej
+		// 	wykonaj m rotacji, idąc od początku linii po prawych potomkach;
+
 	}
 
 	void _setHeight(std::shared_ptr<Node> x){
