@@ -9,12 +9,8 @@
 #include <ctime>    //required for time()
 
 class AVL{
-	// Drzewo AVL jest zrównoważonym drzewem BST
+	// Drzewo AVL jest zrównoważonym drzewem BST bez duplikatów kluczy (które mogą być implementowane przez dodatkowe pole ilość w Node)
 	//	 dzięki złożoność podstawowych operacji utrzymuje się na lg(n) (bo taka jest wysokość)
-	// WŁASNOŚĆ DRZEWA BST
-	// 	Niech x będzie węzłem drzwa BST.
-	// 	Jeśli y jest węzłęm znajdującym się	w lewym poddrzewie węzła x, to y.key <= x.key. 
-	// 	Jeśli y jest węzłęm znajdującym się	w prawym poddrzewie węzła x, to y.key >= x.key. 
 
 	// STRUCTS: 
 
@@ -35,11 +31,14 @@ class AVL{
 		Node(int key, std::shared_ptr<Node> parent):key(key),height(0),p(parent),left(nullptr),right(nullptr){voice();}
 		~Node(){/*std::cout << "Node(" << key << ") dead" << std::endl;*/}
 
-		void voice(){ std::cout << "Node(" << key << ") born" << std::endl; }
+		void voice(){ /*std::cout << "Node(" << key << ") born" << std::endl;*/ }
 	};
-
 	// DATA TYPES:
-
+public:
+	int good =0;
+	int dpl=0;
+	int N=100;
+private:
 	std::shared_ptr<Node>  root;
 
 	// METHODS:
@@ -52,8 +51,21 @@ class AVL{
 			x->right = nullptr;
 		}
 	}
+
+	std::shared_ptr<Node> search(std::shared_ptr<Node> x, int key){
+		if ( ( x==nullptr ) || ( x->key == key ) ){
+			return x;
+		}
+		if ( x->key > key) return search(x->left, key);
+		else return search(x->right,key);
+	}
 		
 	void insertNode(std::shared_ptr<Node> z){
+
+		if ( search(root, z->key) ){
+			dpl++;
+			return;
+		}
 
 		// BST insertion
 		std::shared_ptr<Node> y = nullptr;
@@ -66,10 +78,6 @@ class AVL{
 			else if (z->key > x->key){
 				x = x->right;
 			}
-			else{
-				z.reset();
-				return;
-			}
 		}
 		z->p = y;
 		if ( y == nullptr ) root = z;
@@ -78,57 +86,49 @@ class AVL{
 
 		// balancing AVL
 
-		// https://pl.wikipedia.org/wiki/Drzewo_AVL
-		// https://www.javatpoint.com/insertion-in-avl-tree
-		// https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
-
 		_setHeight(z);
 		
-		// int l = ( y->left ) ? y->left->height : 0;
-		// int r = ( y->right ) ? y->right->height : 0;
-		// int weight = r-l;
-
-		// searching critical node
+		// balancing AVL: searching critical node
 		int balance = 0;
 		std::shared_ptr<Node> c = z;
 		while ( c ){
-			int l = ( c->left ) ? c->left->height : -1;
-			int r = ( c->right ) ? c->right->height : -1;
+			int l = ( c->left ) ? (c->left->height) : -1;
+			int r = ( c->right ) ? (c->right->height) : -1;
 			balance = l-r;
 
 			if ( balance < -1 || balance > 1 ) break;			
 
 			c = c->p;
 		}
-		
-		if (c && ( balance < -1 || balance > 1)){
-			//print();
-			std::cout << c->key << ": " <<  balance << std::endl;
-		}
 
 		if ( c ) {
-// 		LL Rotation 	The new node is inserted to the left sub-tree of left sub-tree of critical node.
 			if ( balance > 1 && c->left && z->key < c->left->key ){
-				std::cout << "LL" << std::endl;
+				// LL Rotation - The new node is inserted to the left sub-tree
+				//	of left sub-tree of critical node.
+				//std::cout << "LL" << std::endl;
 				_rotateRight(c);
 			}
-//  	RR Rotation 	The new node is inserted to the right sub-tree of the right sub-tree of the critical node.
 			else if ( balance < -1 && c->right && z->key > c->right->key ){
-				std::cout << "RR" << std::endl;
+				// RR Rotation - The new node is inserted to the right sub-tree
+				//	of the right sub-tree of the critical node.
+				//std::cout << "RR" << std::endl;
 				_rotateLeft(c);
 			}
-//  	LR Rotation 	The new node is inserted to the right sub-tree of the left sub-tree of the critical node.
 			else if ( balance > 1 && c->left && z->key > c->left->key ){
-				std::cout << "LR" << std::endl;
-				_rotateLeft(c->left);
+				// LR Rotation - The new node is inserted to the right sub-tree
+				//	of the left sub-tree of the critical node.
+				//std::cout << "LR" << std::endl;
+				_rotateLeft(c->left); // wyrzucamy wagę ze środka na lewo
 				_rotateRight(c);
 			}
-//  	RL Rotation 	The new node is inserted to the left sub-tree of the right sub-tree of the critical node.
 			else if ( balance < -1 && c->right && z->key < c->right->key ){
-				std::cout << "RL" << std::endl;
-				_rotateRight(c->right);
+				// RL Rotation - The new node is inserted to the left sub-tree
+				//	of the right sub-tree of the critical node.
+				//std::cout << "RL" << std::endl;
+				_rotateRight(c->right); // wyrzucamy wagę ze środka na prawo
 				_rotateLeft(c);
 			}
+			// do else nigdy nie dochodzi
 		}
 	}
 
@@ -138,7 +138,6 @@ class AVL{
 
 	void _setHeight(std::shared_ptr<Node> x){
 		do{
-			
 			int l = ( x->left ) ? x->left->height : -1;
 			int r = ( x->right ) ? x->right->height : -1;
 			x->height = 1 + ( ( l > r ) ? l : r );
@@ -150,36 +149,43 @@ class AVL{
 	void _rotateRight(std::shared_ptr<Node> q){
 		// obrót w prawo wokół krawędzi (q,p) drzewa
 		std::shared_ptr<Node> p = q->left;
-		if ( q == nullptr || p == nullptr) return;
+		if ( q == nullptr || p == nullptr){
+			return;
+		}
 
+		// 6 zmian - warto rozpisać na kartce obrót dla 1,2,3,4,5 i zawuażyć,
+		//	co się zmieniana na których krawędziach 
 		q->left = p->right;
+		if ( p->right ) p->right->p = q;
 		p->right = q;
-		
+		if ( root == q ) root = p;
+		else if ( q->p->left == q ) q->p->left = p;
+		else if ( q->p->right == q ) q->p->right = p;
 		p->p = q->p;
 		q->p = p;
-		
-		if ( root == q ) root = p;
-		else if ( p->p->left == q ) p->p->left = p;
-		else if ( p->p->right == q ) p->p->right = p;
 
 		_setHeight(q);
+
 	}
 
 	void _rotateLeft(std::shared_ptr<Node> q){
 		// obrót w lewo wokół krawędzi (q,p) drzewa
 		std::shared_ptr<Node> p = q->right;
-		if ( q == nullptr || p == nullptr ) return;
+		if ( q == nullptr || p == nullptr ){
+			return;
+		}
 
+		// 6 zmian - warto rozpisać na kartce obrót dla 1,2,3,4,5 i zawuażyć,
+		//	co się zmieniana na których krawędziach 
 		q->right = p->left;
+		if ( p->left ) p->left->p = q;
 		p->left = q;
-		
+		if ( root == q ) root = p;
+		else if ( q->p->left == q ) q->p->left = p;
+		else if ( q->p->right == q ) q->p->right = p;
 		p->p = q->p;
 		q->p = p;
 		
-		if ( root == q ) root = p;
-		else if ( p->p->left == q ) p->p->left = p;
-		else if ( p->p->right == q ) p->p->right = p;
-
 		_setHeight(q);
 	}
 
@@ -188,7 +194,6 @@ public:
 	~AVL(){_release(root);} // Złożoność przejścia całego drzewa: O(n)
 
 	void insertNode(int key){
-		// złożoność wstawiania: O(h) : h - wysokość drzewa (oczekiwana wartość h dla losowo skonstruowanego drzewa to O( lg(n) )
 		std::shared_ptr<Node> z = std::make_shared<Node>(key); // zamiast new
 		insertNode(z);
 	}
@@ -200,18 +205,20 @@ public:
 			std::cout << prefix;
 
 			if ( node == root) std::cout << "─R─";
-			else std::cout << (isLeft ? "├l─" : "└p─" );
+			else std::cout << (isLeft ? "├l─" : "└r─" );
 
 
-			int l = ( node->left ) ? node->left->height : -1;
-			int r = ( node->right ) ? node->right->height : -1;
+			int l = ( node->left ) ? (node->left->height) : -1;
+			int r = ( node->right ) ? (node->right->height) : -1;
 			int balance = l-r;
 
-			if ( balance < -1 || balance > 1  ) std::cout << "CHUJ BOMBKI STRZELIŁ ";
+			// tylko dla sprawdzenia:
+			if ( balance < -1 || balance > 1  ) std::cout << "UWAGA! GAŁĄŹ NIEZRÓWNOWAŻONA!";
 
 			// print the value of the node
-			std::cout << node->key << "(" << node->height << ";" << balance << ")" << std::endl;
-
+			std::cout << node->key << std::endl;
+			//std::cout << node->key << "(" << node->height << ";" << balance << ";" << ( (node->p) ? node->p->key : -1 ) << ")" << std::endl;
+			good++;
 			// enter the next tree level - left and right branch
 			print( prefix + (isLeft ? "│   " : "    "), node->left, true);
 			print( prefix + (isLeft ? "│   " : "    "), node->right, false);
@@ -221,17 +228,9 @@ public:
 
 	void createSample(){
     	srand(time(0)); 
-		for (int i=0;i<50;i++){
-			insertNode( (rand () % 50) + 0 );
-			//print();
+		for (int i=0;i<N;i++){
+			insertNode( (rand () % (5*N)) + 0 );
 		}
-	}
-
-	void rR(){
-		_rotateRight(root);
-	}
-	void rL(){
-		_rotateLeft(root);
 	}
 };
 
@@ -241,9 +240,7 @@ int main(void){
 	tree.createSample();
 	tree.print();
 
-
-
-
+	std::cout << tree.good << "/" << tree.N << "(" << tree.dpl << ")" << std::endl;
 
 	std::cout << "========================" << std::endl;
 	return 0;

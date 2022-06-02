@@ -27,9 +27,9 @@ Based on Cormen's "Introduction to algorithms".
 - queue [13], Cor 11.1
 - list [14], Cor 11.2
 - BST tree [15], Cor 13
+- AVL tree [16]
 
 ##### Coming soon:
-- AVL tree [16],
 - Hash algorithms
 - Graph algorithms
 
