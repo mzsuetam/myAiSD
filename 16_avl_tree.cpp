@@ -8,7 +8,7 @@
 #include <cstdlib>  //required for rand(), srand()
 #include <ctime>    //required for time()
 
-#include "15_bst_tree.cpp"
+//#include "15_bst_tree.cpp"
 
 class AVL{
 	// Drzewo AVL jest zrównoważonym drzewem BST bez duplikatów kluczy (które mogą być implementowane przez dodatkowe pole ilość w Node)
@@ -39,7 +39,7 @@ class AVL{
 public:
 	int good =0;
 	int dpl=0;
-	int N=100;
+	int N=10000;
 private:
 	std::shared_ptr<Node>  root;
 
