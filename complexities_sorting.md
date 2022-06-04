@@ -24,7 +24,7 @@ In-place - sorted items occupy the same storage as the original ones.
 *Cmpx. - Complexity on*
 *cmpr. - comparison*
 *n-cmpr. - Non-comparison*
-*log(n) - natural logarithm of base 2 of n*
+*log(n) - logarithm of base 2 of n*
 *SFCD - Segmentation fault (core dumped)*
 *n/c - not checked*
 

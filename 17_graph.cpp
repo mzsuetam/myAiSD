@@ -3,6 +3,7 @@
 #include <queue>
 #include <list>
 #include <climits>
+#include <cstdlib>
 
 #define INF INT_MAX
 
@@ -23,6 +24,11 @@ class GraphMatrixBased{
 	std::vector< std::vector< Edge > > matrix;
 
 public:
+
+	std::vector< std::vector< Edge > > getMatrix(){
+		return matrix;
+	}
+
 	enum graph_type{ GRAPH, DIGRAPH };
 
 	void makeTemplate(){
@@ -72,9 +78,9 @@ public:
 		matrix[2][4].exist = true;
 		matrix[2][4].weight = 1;
 		matrix[3][7].exist = true;
-		matrix[3][7].weight = 0;
+		matrix[3][7].weight = 4;
 		matrix[5][8].exist = true;
-		matrix[5][8].weight = 7;
+		matrix[5][8].weight = 100000;
 		matrix[6][9].exist = true;
 		matrix[6][9].weight = 3;
 		matrix[7][8].exist = true;
@@ -148,6 +154,7 @@ public:
 	void DFS(int start){
 		std::cerr << "DFS" << std::endl;
 		std::vector<bool> visited( matrix.size() );
+		visited.assign(matrix.size(),false);
 		DFS(visited, start);
 		std::cerr << std::endl;
 	}	
@@ -155,6 +162,7 @@ public:
 	void BFS(int start)	{
 		std::cerr << "BFS" << std::endl;
 		std::vector<bool> visited( matrix.size() );
+		visited.assign(matrix.size(),false);
 		std::vector<int> predecesors( matrix.size() );
 		std::vector<int> distance( matrix.size() ); // w drzewie to wysokość
 		std::queue<int> for_visit;
@@ -188,6 +196,7 @@ public:
 	std::vector<int> topologicalSort(){
 		std::cerr << "Topological Sort" << std::endl;
 		std::vector<bool> visited( matrix.size() );
+		visited.assign(matrix.size(),false);
 		std::queue<int> order;
 		for (size_t i=0; i<matrix.size();i++){
 			if ( !visited[i] )
@@ -208,6 +217,7 @@ public:
 		std::cerr << "Prim algorithm" << std::endl;
 		std::priority_queue<Edge> Q;
 		std::vector<bool> visited( matrix.size() );
+		visited.assign(matrix.size(),false);
 		std::vector<int> predecesors( matrix.size() );
 		for (size_t i=0; i<matrix.size(); i++){
 			predecesors[i] = -1;
@@ -305,6 +315,7 @@ public:
 		};
 		std::priority_queue<Pair> Q;
 		std::vector<bool> visited( matrix.size() );
+		visited.assign(matrix.size(),false);
 		std::vector<int> predecesors( matrix.size() );
 		std::vector<int> distance( matrix.size() ); 
 		for (size_t i=0; i<matrix.size(); i++){
@@ -366,14 +377,109 @@ public:
 		return predecesors_matrix;
 	}
 
+	int Ford_Fulkerson_DFS( std::vector< std::vector<int> >& flow_matrix, std::vector<bool>& visited, int v, int end, int min_flow){
+		//std::cerr << "FF_DFS " << matrix.size() << std::endl;
+		visited[v] = true;
+		if ( v == end ) return min_flow;
+		for (size_t i=0; i<matrix.size(); i++){
+			//std::cerr << "for1" << std::endl;
+			if ( matrix[v][i].exist && !visited[i] ){
+				//std::cerr << "if1" << std::endl;
+				int flow_left = matrix[v][i].weight - flow_matrix[v][i];
+				if ( flow_left > 0 ){
+					//std::cerr << "if2" << std::endl;
+					int new_flow = Ford_Fulkerson_DFS(flow_matrix, visited, i, end, std::min(flow_left,min_flow));
+					if ( new_flow ){ // znaleźliśmy jakiś przepływ
+						//std::cerr << "if3" << std::endl;
+						flow_matrix[v][i] += new_flow;
+						flow_matrix[i][v] -= new_flow;
+						return new_flow;
+					}
+				}
+			}
+		}
+		//std::cerr << "FF_DFS end" << std::endl;
+		return 0;
+	}
+
+	std::vector< std::vector<int> > Ford_Fulkerson(int start, int end){ // maksymalny przepływ
+		std::cerr << "Ford-Fulkerson algorithm" << std::endl;
+		std::vector< std::vector<int> > flow_matrix;
+		std::vector< bool > visited;
+		visited.assign(matrix.size(),false);
+		flow_matrix.resize( matrix.size() );
+		for (size_t i=0; i<flow_matrix.size(); i++){
+			flow_matrix[i].resize( matrix.size() );
+			for (size_t j=0; j<flow_matrix.size(); j++){
+				flow_matrix[i][j] = 0;
+			}
+		}	
+
+		int e = Ford_Fulkerson_DFS(flow_matrix, visited, start, end, INF);
+		while (1) {
+			//std::cerr << "(" << e << ")" << std::endl;
+			visited.assign(matrix.size(),false);
+			e = Ford_Fulkerson_DFS(flow_matrix, visited, start, end, INF);
+			if ( e==0 ) break;
+		}
+
+		//std::cerr << flow_matrix.size() << std::endl;
+
+		return flow_matrix;
+	}
+
+	void printGraph(std::string name){
+		// http://graphviz.org/doc/info/command.html
+		// program.out | dot -Tsvg > output.svg
+		graph_type type = GRAPH;
+
+		for ( size_t i=0; i < matrix.size() && type==GRAPH; i++){
+			for ( size_t j=0; j < matrix.size(); j++){
+				if ( matrix[i][j].exist != matrix[j][i].exist ){
+					type = DIGRAPH;
+					break;
+				}
+			}
+		}
+
+		std::string dot = "";
+
+		if ( type==GRAPH )
+			dot += "graph {";
+		else // if (type==DIGRAPH)
+			dot += "digraph {";
+
+		for ( size_t i=0; i<matrix.size(); i++){
+			dot += std::to_string(i) + " ";
+			for ( size_t j=0; j<matrix[i].size(); j++){
+				if ( matrix[i][j].exist && ( type==DIGRAPH || i<j )){
+					dot += std::to_string(i);
+					if ( type==GRAPH )
+						dot += "--";
+					else
+						dot += "->";
+					dot += std::to_string(j) + " [weight=" + std::to_string(matrix[i][j].weight) + "] ";
+				}
+			}
+		}
+		dot += "}";
+
+		std::string cmd="echo \"" + dot + "\" | dot -Tsvg > graphs_svg/" + name + ".svg;";
+
+
+		//std::cout << cmd << std::endl;
+
+		std::system(cmd.c_str());
+	}
 };
+
 
 int main(){
 
 	GraphMatrixBased graph;
 	//graph.makeTemplate();
 	graph.makeTemplateWithoutCycles();
-	//graph.print(GraphMatrixBased::DIGRAPH);
+	graph.printGraph("17_graph_without_cycles");
 
 
 	// PODSTAWOWE ALGORYTMY GRAFOWE:
@@ -423,7 +529,7 @@ int main(){
 	// NAJKRÓTSZE ŚCIEŻKI MIĘDZY WSZYSTKIMI PARAMI WIERZCHOŁKÓW
 	{
 		// *tego na kolosie nie będzie
-		graph.print(GraphMatrixBased::GRAPH);
+		//graph.print(GraphMatrixBased::GRAPH);
 		std::vector< std::vector<int> > out = graph.Floyd_Warshall();
 		for (size_t i=0; i<out.size(); i++){
 			for (size_t j=0; j<out.size(); j++){
@@ -436,6 +542,20 @@ int main(){
 	}
 
 	// MAKSYMALNY PRZEPŁYW:
+	{
+		graph.makeNotDirected();
+		graph.printGraph("17_graph_not_directed");
+
+		std::vector< std::vector<int> > out = graph.Ford_Fulkerson(0,9);
+		//std::cerr << out.size() <<  std::endl;	
+		for (size_t i=0; i<out.size(); i++){
+			for (size_t j=0; j<out.size(); j++){
+				std::cerr << ( ( out[i][j]!=INF ) ? out[i][j] : -1 ) << " ";
+			}
+			std::cerr << std::endl;
+		}
+		std::cerr <<  std::endl;	
+	}
 
 	return 0;
 }
