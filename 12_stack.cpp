@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 #define MAX_STACK_SIZE 10
 

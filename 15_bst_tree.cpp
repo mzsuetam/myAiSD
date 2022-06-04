@@ -147,6 +147,9 @@ public:
 
 	void insertNode(int key){
 		// złożoność wstawiania: O(h) : h - wysokość drzewa (oczekiwana wartość h dla losowo skonstruowanego drzewa to O( lg(n) )
+		if ( search(root, key) ){
+			return;
+		}
 		std::shared_ptr<Node> z = std::make_shared<Node>(key); // zamiast new
 		insertNode(z);
 	}
@@ -237,16 +240,16 @@ int main(void){
 	tree.print();
 	tree.insertNode(1);
 	tree.print();
-	tree.insertNode(7);
+	tree.insertNode(9);
 	tree.print();
 	tree.insertNode(13);
 	tree.print();
 
 	tree.deleteNode(tree.search(1));
 	tree.print();
-	tree.deleteNode(tree.search(7));
+	tree.deleteNode(tree.search(6));
 	tree.print();
-	tree.deleteNode(tree.search(3));
+	tree.deleteNode(tree.search(4));
 	tree.print();
 
 
