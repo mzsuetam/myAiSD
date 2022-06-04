@@ -428,7 +428,7 @@ public:
 		return flow_matrix;
 	}
 
-	void printGraph(std::string name){
+	void printGraph(std::string name = "graph"){
 		// http://graphviz.org/doc/info/command.html
 		// program.out | dot -Tsvg > output.svg
 		graph_type type = GRAPH;
@@ -464,7 +464,7 @@ public:
 		}
 		dot += "}";
 
-		std::string cmd="echo \"" + dot + "\" | dot -Tsvg > graphs_svg/" + name + ".svg;";
+		std::string cmd="echo \"" + dot + "\" | dot -Tsvg > graphs_svg/" + name + ".svg; gio open ./graphs_svg/" + name + ".svg";
 
 
 		//std::cout << cmd << std::endl;
