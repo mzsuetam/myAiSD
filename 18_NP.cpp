@@ -285,6 +285,66 @@ std::vector <bool> podzial_zbioru(const std::vector <int> &liczby, bool &istniej
 	return std::vector <bool> ();
 }
 
+std::vector <bool> podzial_zbioru_dynamiczny_plecak(const std::vector <int> &liczby, bool &istnieje)
+{
+	int n = liczby.size(), suma = 0;
+
+	istnieje = false;
+
+	for(size_t i = 0; i < n; i++)
+		suma += liczby[i];
+	
+	if(suma % 2 == 1)
+		return std::vector <bool> ();
+
+	int oczekiwana_suma = suma / 2;
+
+	std::vector <std::vector<int>> plecak(n + 1);
+	for(size_t i = 0; i <= n; i++)
+		plecak[i].resize(oczekiwana_suma + 1);
+
+	for(int i = 0; i <= n; i++)
+	{
+		for(int j = 0; j <= oczekiwana_suma; j++)
+		{
+			if(i == 0 || j == 0)
+				plecak[i][j] = 0;
+			else
+			{
+				plecak[i][j] = plecak[i - 1][j];
+				if(j - liczby[i - 1] >= 0 && plecak[i - 1][j - liczby[i - 1]] + liczby[i - 1] > plecak[i][j])
+					plecak[i][j] = plecak[i - 1][j - liczby[i - 1]] + liczby[i - 1];
+			}
+		}
+	}
+
+	if(plecak[n][oczekiwana_suma] != oczekiwana_suma)
+		return std::vector <bool> ();
+
+	istnieje = true;
+
+	int suma_teraz = oczekiwana_suma, przedmiot = n;
+
+	std::vector <bool> wynik(n);
+	wynik.assign(n, false);
+
+	while(suma_teraz > 0 && przedmiot > 0)
+	{
+		if(plecak[przedmiot][suma_teraz] == plecak[przedmiot - 1][suma_teraz])
+		{
+			przedmiot--;
+		}
+		else
+		{
+			wynik[przedmiot - 1] = true;
+			przedmiot--;
+			suma_teraz -= liczby[przedmiot];
+		}
+	}
+
+	return wynik;
+}
+
 int main()
 {
 	srand(time(nullptr));
@@ -379,9 +439,10 @@ int main()
 
 	{
 		// Problem podzialu zbioru
-		std::cout << "Problem podzialu zbioru: " << std::endl;
-		size_t n = 20, maks = 14;
+		std::cout << "Problem podzialu zbioru:" << std::endl; // Mozna zrobic dla malych liczb szybciej dynamicznie (problem plecakowy)
+		size_t n = 64, maks = 1000;
 		bool istnieje = true;
+		int suma;
 		std::vector <int> liczby(n);
 		
 		for(size_t i = 0; i < n; i++)
@@ -391,17 +452,57 @@ int main()
 		std::vector <bool> wynik = podzial_zbioru(liczby, istnieje);
 		if(istnieje)
 		{
+			suma = 0;
 			std::cout << "Podzial:\nCzesc 1:" << std::endl;
 			for(size_t i = 0; i < n; i++)
 				if(wynik[i])
+				{
+					suma += liczby[i];
 					std::cout << liczby[i] << ' ';
+				}
 			std::cout << std::endl;
+			std::cout << "Suma: " << suma << std::endl;
 
-			std::cout << "Podzial:\nCzesc 2:" << std::endl;
+			suma = 0;
+			std::cout << "\nCzesc 2:" << std::endl;
 			for(size_t i = 0; i < n; i++)
 				if(!wynik[i])
+				{
+					suma += liczby[i];
 					std::cout << liczby[i] << ' ';
+				}
 			std::cout << std::endl;
+			std::cout << "Suma: " << suma << std::endl;
+		}
+		else
+			std::cout << "Nie istnieje podzial tego zbioru" << std::endl;
+
+		// Dynamicznie
+		std::cout << "Problem podzialu zbioru dynamicznie:" << std::endl;
+		wynik = podzial_zbioru_dynamiczny_plecak(liczby, istnieje);
+		if(istnieje)
+		{
+			suma = 0;
+			std::cout << "Podzial:\nCzesc 1:" << std::endl;
+			for(size_t i = 0; i < n; i++)
+				if(wynik[i])
+				{
+					suma += liczby[i];
+					std::cout << liczby[i] << ' ';
+				}
+			std::cout << std::endl;
+			std::cout << "Suma: " << suma << std::endl;
+
+			suma = 0;
+			std::cout << "\nCzesc 2:" << std::endl;
+			for(size_t i = 0; i < n; i++)
+				if(!wynik[i])
+				{
+					suma += liczby[i];
+					std::cout << liczby[i] << ' ';
+				}
+			std::cout << std::endl;
+			std::cout << "Suma: " << suma << std::endl;
 		}
 		else
 			std::cout << "Nie istnieje podzial tego zbioru" << std::endl;
