@@ -55,6 +55,25 @@ public:
 		matrix[7][4].exist = true;
 	}
 
+	void makeTemplateFull(){
+		// initing matrix
+		matrix.resize(6);
+		for (size_t i=0; i<matrix.size(); i++ ){
+			matrix[i].resize(6);
+			for (size_t j=0; j<matrix.size(); j++ ){
+				matrix[i][j].from = i;
+				matrix[i][j].to = j;
+				matrix[i][j].exist = true;
+			}
+		}
+		for (size_t i=0; i<matrix.size(); i++ ){
+			for (size_t j=0; j<i; j++ ){ 
+				matrix[j][i].weight =	matrix[i][j].weight = i*j + i + 1;
+				std::cout << i << j << ": " << matrix[i][j].from << "--" << matrix[i][j].to << " [w=" << matrix[i][j].weight <<"]"<< std::endl;
+			}
+		}
+	}
+
 	void makeTemplateWithoutCycles(){
 		// initing matrix
 		matrix.resize(10);
@@ -100,36 +119,35 @@ public:
 		}
 	}
 
-	void print(graph_type type){
-		// http://graphviz.org/doc/info/command.html
-		// program.out | dot -Tsvg > output.svg
+	GraphMatrixBased(){}
 
-		if ( type==GRAPH )
-			std::cout << "graph {";
-		else // if (type==DIGRAPH)
-			std::cout << "digraph {";
-		for ( size_t i=0; i<matrix.size(); i++){
-			std::cout << i << std::endl;
-			for ( size_t j=0; j<matrix[i].size(); j++){
-				if ( matrix[i][j].exist && ( type==DIGRAPH || i<j )){
-					std::cout << i;
-					if ( type==GRAPH )
-						std::cout << "--";
-					else
-						std::cout << "->";
-					std::cout << j << " [weight=" << matrix[i][j].weight << "]" << std::endl;
-				}
+	GraphMatrixBased( const std::vector<int>& predecesors ){
+		size_t new_size = predecesors.size();
+		matrix.resize(new_size);
+		for (size_t i=0; i<new_size; i++ ){
+			matrix[i].resize(new_size);
+			for (size_t j=0; j<new_size; j++ ){
+				matrix[i][j].from = i;
+				matrix[i][j].to = j;
 			}
 		}
-		
-		std::cout << "}" << std::endl;
+		for (size_t i=0; i<new_size; i++ ){
+			int p = predecesors[i];
+			if ( p == -1 ) continue;
+			matrix[p][i].exist = true;
+			matrix[p][i].weight = 1;
+		}
+	}
+
+	size_t getSize(){
+		return matrix.size();
 	}
 
 private:
 	void DFS( std::vector<bool>& visited, int v /* vertex */){
 		visited[v] = true;
 		// preorder
-		std::cerr << v << " ";
+		std::cout << v << " ";
 		for (size_t i=0; i<matrix.size(); i++){
 			if ( matrix[v][i].exist && !visited[i] ){
 				// inorder
@@ -152,15 +170,15 @@ private:
 
 public:
 	void DFS(int start){
-		std::cerr << "DFS" << std::endl;
+		std::cout << "DFS" << std::endl;
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
 		DFS(visited, start);
-		std::cerr << std::endl;
+		std::cout << std::endl;
 	}	
 
 	void BFS(int start)	{
-		std::cerr << "BFS" << std::endl;
+		std::cout << "BFS" << std::endl;
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
 		std::vector<int> predecesors( matrix.size() );
@@ -188,13 +206,13 @@ public:
 		}
 
 		for (size_t i=0; i<matrix.size(); i++){
-			std::cerr << i << "(" << predecesors[i] << "," << distance[i] << ")";
+			std::cout << i << "(" << predecesors[i] << "," << distance[i] << ")";
 		}
-		std::cerr << std::endl;
+		std::cout << std::endl;
 	}
 
 	std::vector<int> topologicalSort(){
-		std::cerr << "Topological Sort" << std::endl;
+		std::cout << "Topological Sort" << std::endl;
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
 		std::queue<int> order;
@@ -214,7 +232,7 @@ public:
 	std::vector<int>/*poprzedników*/ Prim(){
 		// zwraca minimalne drzewo rozpinające
 		// Złożonośc O( (V+E)*log_2(V) )
-		std::cerr << "Prim algorithm" << std::endl;
+		std::cout << "Prim algorithm" << std::endl;
 		std::priority_queue<Edge> Q;
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
@@ -228,14 +246,14 @@ public:
 			for (size_t i=0; i<matrix.size(); i++){
 				if ( matrix[v][i].exist ){
 					Q.push(matrix[v][i]);
-					std::cerr << "";
+					std::cout << "";
 				}
 			}
 			visited[v] = true;
 			while ( !Q.empty() ){
 				Edge e = Q.top();
 				Q.pop();
-				//std::cerr << e.from << "->" << e.to << std::endl;
+				//std::cout << e.from << "->" << e.to << std::endl;
 				if ( !visited[e.to] ){
 					visited[e.to] = true;
 					predecesors[e.to] = e.from;
@@ -264,7 +282,7 @@ public:
 		// Złożoność dla listy sąsiedztwa: O( V*E ) 
 		// Nasza złożoność: O( V^3 ) (XD)
 
-		std::cerr << "Bellman-Ford algorithm" << std::endl;
+		std::cout << "Bellman-Ford algorithm" << std::endl;
 
 		// działa również dla ujemnych krawędzi
 		std::vector<int> predecesors( matrix.size() );
@@ -302,7 +320,7 @@ public:
 	std::vector<int> Dijkstra( int start ){ // to się czyta "Dajkstra" :)
 		// zwraca odległości pomiędzy startem a każdym innym wierzchołkiem
 		// Złożonośc O( (V+E)*log_2(V) )
-		std::cerr << "Dijkstra algorithm" << std::endl;
+		std::cout << "Dijkstra algorithm" << std::endl;
 		struct Pair{
 			int dist; // from start to v
 			int v;
@@ -340,7 +358,7 @@ public:
 	}
 
 	std::vector< std::vector< int > > Floyd_Warshall(){
-		std::cerr << "Floyd-Warshall algorithm" << std::endl;
+		std::cout << "Floyd-Warshall algorithm" << std::endl;
 		// zwraca najkrótsze ścieżki między każdymi wierzchołkami
 		// Złożoność O ( n^3 )
 		std::vector< std::vector< int > > distance_matrix;
@@ -378,19 +396,19 @@ public:
 	}
 
 	int Ford_Fulkerson_DFS( std::vector< std::vector<int> >& flow_matrix, std::vector<bool>& visited, int v, int end, int min_flow){
-		//std::cerr << "FF_DFS " << matrix.size() << std::endl;
+		//std::cout << "FF_DFS " << matrix.size() << std::endl;
 		visited[v] = true;
 		if ( v == end ) return min_flow;
 		for (size_t i=0; i<matrix.size(); i++){
-			//std::cerr << "for1" << std::endl;
+			//std::cout << "for1" << std::endl;
 			if ( matrix[v][i].exist && !visited[i] ){
-				//std::cerr << "if1" << std::endl;
+				//std::cout << "if1" << std::endl;
 				int flow_left = matrix[v][i].weight - flow_matrix[v][i];
 				if ( flow_left > 0 ){
-					//std::cerr << "if2" << std::endl;
+					//std::cout << "if2" << std::endl;
 					int new_flow = Ford_Fulkerson_DFS(flow_matrix, visited, i, end, std::min(flow_left,min_flow));
 					if ( new_flow ){ // znaleźliśmy jakiś przepływ
-						//std::cerr << "if3" << std::endl;
+						//std::cout << "if3" << std::endl;
 						flow_matrix[v][i] += new_flow;
 						flow_matrix[i][v] -= new_flow;
 						return new_flow;
@@ -398,12 +416,12 @@ public:
 				}
 			}
 		}
-		//std::cerr << "FF_DFS end" << std::endl;
+		//std::cout << "FF_DFS end" << std::endl;
 		return 0;
 	}
 
 	std::vector< std::vector<int> > Ford_Fulkerson(int start, int end){ // maksymalny przepływ
-		std::cerr << "Ford-Fulkerson algorithm" << std::endl;
+		std::cout << "Ford-Fulkerson algorithm" << std::endl;
 		std::vector< std::vector<int> > flow_matrix;
 		std::vector< bool > visited;
 		visited.assign(matrix.size(),false);
@@ -417,13 +435,13 @@ public:
 
 		int e = Ford_Fulkerson_DFS(flow_matrix, visited, start, end, INF);
 		while (1) {
-			//std::cerr << "(" << e << ")" << std::endl;
+			//std::cout << "(" << e << ")" << std::endl;
 			visited.assign(matrix.size(),false);
 			e = Ford_Fulkerson_DFS(flow_matrix, visited, start, end, INF);
 			if ( e==0 ) break;
 		}
 
-		//std::cerr << flow_matrix.size() << std::endl;
+		//std::cout << flow_matrix.size() << std::endl;
 
 		return flow_matrix;
 	}
@@ -473,6 +491,7 @@ public:
 	}
 };
 
+#ifndef DONT_INCLUDE_MAIN
 
 int main(){
 
@@ -490,9 +509,9 @@ int main(){
 	{
 		std::vector<int> out = graph.topologicalSort();
 		for (size_t i=0; i<out.size(); i++){
-			std::cerr << out[i] << " ";
+			std::cout << out[i] << " ";
 		}
-		std::cerr << std::endl;
+		std::cout << std::endl;
 	}
 
 	// MINIMALNE DRZEWA ROZPINAJĄCE:
@@ -502,9 +521,9 @@ int main(){
 		//graph.print(GraphMatrixBased::GRAPH);
 		std::vector<int> out = g2.Prim();
 		for (size_t i=0; i<out.size(); i++){
-			std::cerr << out[i] << " ";
+			std::cout << out[i] << " ";
 		}
-		std::cerr << std::endl;
+		std::cout << std::endl;
 	}
 
 	// NAJKRÓTSZE ŚCIEŻKI Z 1 ŹRÓDŁEM:
@@ -514,15 +533,17 @@ int main(){
 		bool exist_negative_cycle;
 		std::vector<int> out = graph.Bellman_Ford(0,exist_negative_cycle);
 		for (size_t i=0; i<out.size(); i++){
-			std::cerr << out[i] << " ";
+			std::cout << out[i] << " ";
 		}
-		std::cerr << std::endl;
+		std::cout << std::endl;
 
 		std::vector out2 = graph.Dijkstra(0);
 		for (size_t j=0; j<out.size(); j++){
-			std::cerr << ( (out2[j]!=INF) ? out2[j] : -1 ) << " ";
+			std::cout << ( (out2[j]!=INF) ? out2[j] : -1 ) << " ";
 		}
-		std::cerr << std::endl;
+		GraphMatrixBased dji_graph(out2);
+		dji_graph.printGraph("17_dji_graph");
+		std::cout << std::endl;
 
 	}
 	
@@ -533,11 +554,11 @@ int main(){
 		std::vector< std::vector<int> > out = graph.Floyd_Warshall();
 		for (size_t i=0; i<out.size(); i++){
 			for (size_t j=0; j<out.size(); j++){
-				std::cerr << ( ( out[i][j]!=INF ) ? out[i][j] : -1 ) << " ";
+				std::cout << ( ( out[i][j]!=INF ) ? out[i][j] : -1 ) << " ";
 			}
-			std::cerr << std::endl;
+			std::cout << std::endl;
 		}
-		std::cerr << std::endl;
+		std::cout << std::endl;
 		 
 	}
 
@@ -547,15 +568,17 @@ int main(){
 		graph.printGraph("17_graph_not_directed");
 
 		std::vector< std::vector<int> > out = graph.Ford_Fulkerson(0,9);
-		//std::cerr << out.size() <<  std::endl;	
+		//std::cout << out.size() <<  std::endl;	
 		for (size_t i=0; i<out.size(); i++){
 			for (size_t j=0; j<out.size(); j++){
-				std::cerr << ( ( out[i][j]!=INF ) ? out[i][j] : -1 ) << " ";
+				std::cout << ( ( out[i][j]!=INF ) ? out[i][j] : -1 ) << " ";
 			}
-			std::cerr << std::endl;
+			std::cout << std::endl;
 		}
-		std::cerr <<  std::endl;	
+		std::cout <<  std::endl;	
 	}
 
 	return 0;
 }
+
+#endif
