@@ -173,19 +173,10 @@ std::vector<int> problem_kliki(const GraphMatrixBased &graph, int k)
 		bool czy_dobry = true;
 
 		for (size_t i = 0; i < n && czy_dobry; i++)
-		{
 			if (p & (1 << i))
-			{
 				for (size_t j = 0; j < n && czy_dobry; j++)
-				{
 					if (i != j && !graph.getExists(i, j) && (p & (1 << j)))
-					{
 						czy_dobry = false;
-						break;
-					}
-				}
-			}
-		}
 
 		if (czy_dobry)
 		{
@@ -197,6 +188,36 @@ std::vector<int> problem_kliki(const GraphMatrixBased &graph, int k)
 		}
 	}
 	while (podzbior.nextSubSet());
+
+	return wynik;
+}
+
+std::vector <int> pokrycie_wierzcholkowe(const GraphMatrixBased &graph, int k)
+{
+	std::vector<int> wynik;
+	size_t n = graph.getSize();
+	SubSets podzbior(n, k);
+
+	do
+	{
+		long long p = podzbior.getSubset();
+		bool czy_dobry = true;
+
+		for(size_t i = 0; i < n && czy_dobry; i++)
+			for(size_t j = 0; j < n && czy_dobry; j++)
+				if(graph.getExists(i, j) && !((p & (1 << i)) || (p & (1 << j))))
+					czy_dobry = false;
+
+		if(czy_dobry)
+		{
+			for (size_t i = 0; i < n; i++)
+				if (p & (1 << i))
+					wynik.push_back(i);
+
+			return wynik;
+		}
+	}
+	while(podzbior.nextSubSet());
 
 	return wynik;
 }
@@ -235,11 +256,40 @@ int main()
 		graph.makeNotDirected();
 		graph.printGraph("18_klika");
 
-		std::vector <int> klika = problem_kliki(graph, 4);
+		int k = 4;
 
-		for(size_t i = 0; i < klika.size(); i++)
-			std::cout << klika[i] << ' ';
-		std::cout << std::endl;
+		std::vector <int> klika = problem_kliki(graph, k);
+
+		if(klika.size() != 0)
+		{
+			for(size_t i = 0; i < klika.size(); i++)
+				std::cout << klika[i] << ' ';
+			std::cout << std::endl;
+		}
+		else
+			std::cout << "Nie istnieje " << k << "-klika jako podgraf tego grafu" << std::endl;
+	}
+
+	{
+		// Pokrycie wierzcholkowe
+		std::cout << "Problem pokrycia wierzcholkowego:" << std::endl;
+		GraphMatrixBased graph;
+		graph.makeTemplate();
+		graph.makeNotDirected();
+		graph.printGraph("18_pokrycie_wierzcholkowe");
+
+		int k = 4;
+
+		std::vector <int> pokrycie = pokrycie_wierzcholkowe(graph, k);
+
+		if(pokrycie.size() != 0)
+		{
+			for(size_t i = 0; i < pokrycie.size(); i++)
+				std::cout << pokrycie[i] << ' ';
+			std::cout << std::endl;
+		}
+		else
+			std::cout << "Nie istnieje pokrycie wierzcholkowe o k = " << k << std::endl;
 	}
 
 	///
