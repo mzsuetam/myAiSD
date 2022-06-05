@@ -25,7 +25,7 @@ class GraphMatrixBased{
 
 public:
 
-	std::vector< std::vector< Edge > > getMatrix(){
+	std::vector< std::vector< Edge > > getMatrix() const{
 		return matrix;
 	}
 
@@ -43,6 +43,8 @@ public:
 		}
 		matrix[0][1].exist = true;
 		matrix[1][2].exist = true;
+		matrix[1][4].exist = true;
+		matrix[2][3].exist = true;
 		matrix[2][4].exist = true;
 		matrix[3][0].exist = true;
 		matrix[3][1].exist = true;
@@ -139,12 +141,17 @@ public:
 		}
 	}
 
-	size_t getSize(){
+	size_t getSize() const{
 		return matrix.size();
 	}
 
-	int getWeight(size_t x, size_t y){
+	int getWeight(size_t x, size_t y) const{
 		return matrix[x][y].weight;
+	}
+
+	bool getExists(size_t x, size_t y) const
+	{
+		return matrix[x][y].exist;
 	}
 
 private:
