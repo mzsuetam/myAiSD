@@ -222,6 +222,31 @@ std::vector <int> pokrycie_wierzcholkowe(const GraphMatrixBased &graph, int k)
 	return wynik;
 }
 
+std::vector <int> cykl_Hamiltona(const GraphMatrixBased &graph)
+{
+	std::vector<int> wynik;
+	size_t n = graph.getSize();
+	Permutations perm(n);
+
+	do
+	{
+		const std::vector<int> &perm_v = perm.getPermutation();
+		bool czy_dobry = true;
+
+		for(int i = 0; i < n - 1 && czy_dobry; i++)
+			if(!graph.getExists(perm_v[i], perm_v[i + 1]))
+				czy_dobry = false;
+		if(!graph.getExists(perm_v[n - 1], perm_v[0]))
+			czy_dobry = false;
+
+		if(czy_dobry)
+			return perm_v;
+	}
+	while(perm.nextPermutation());
+
+	return std::vector <int> ();
+}
+
 int main()
 {
 	// Generowanie wszystkich podzbiorów (ten nie jest NP):
@@ -290,6 +315,26 @@ int main()
 		}
 		else
 			std::cout << "Nie istnieje pokrycie wierzcholkowe o k = " << k << std::endl;
+	}
+
+	{
+		// Cykl Hamiltona
+		std::cout << "Cykl Hamiltona: " << std::endl;
+		GraphMatrixBased graph;
+		graph.makeTemplate();
+		graph.makeNotDirected();
+		graph.printGraph("18_cykl_Hamiltona");
+
+		std::vector <int> cykl = cykl_Hamiltona(graph);
+
+		if(cykl.size() != 0)
+		{
+			for(size_t i = 0; i < cykl.size(); i++)
+				std::cout << cykl[i] << ' ';
+			std::cout << std::endl;
+		}
+		else
+			std::cout << "Nie ma cyklu Hamiltona w tym grafie!" << std::endl;
 	}
 
 	///

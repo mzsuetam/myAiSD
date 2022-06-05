@@ -1,6 +1,6 @@
 # myAiSD
 
-Author: Mateusz Mazur
+Author: Mateusz Mazur, Piotr Kubala (contribution to 17_graph.cpp and 18_NP.cpp)
 
 My implementations of some basic algorithrms and data structures.
 Based on Cormen's "Introduction to algorithms".
