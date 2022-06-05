@@ -247,8 +247,48 @@ std::vector <int> cykl_Hamiltona(const GraphMatrixBased &graph)
 	return std::vector <int> ();
 }
 
+std::vector <bool> podzial_zbioru(const std::vector <int> &liczby, bool &istnieje)
+{
+	int n = liczby.size(), suma = 0;
+	SubSets podzbior(n);
+
+	istnieje = false;
+
+	for(size_t i = 0; i < n; i++)
+		suma += liczby[i];
+	
+	if(suma % 2 == 1)
+		return std::vector <bool> ();
+
+	do
+	{
+		long long p = podzbior.getSubset();
+		int suma_t = 0;
+
+		for(size_t i = 0; i < n; i++)
+			if(p & (1 << i))
+				suma_t += liczby[i];
+		
+		if(suma_t * 2 == suma)
+		{
+			std::vector <bool> wynik(n);
+
+			for(size_t i = 0; i < n; i++)
+				wynik[i] = p & (1 << i);
+
+			istnieje = true;
+			return wynik;
+		}
+	}
+	while (podzbior.nextSubSet());
+	
+	return std::vector <bool> ();
+}
+
 int main()
 {
+	srand(time(nullptr));
+
 	// Generowanie wszystkich podzbiorów (ten nie jest NP):
 	std::cout << "Podzbiory:" << std::endl;
 	SubSets zbior(5, 2);
@@ -335,6 +375,36 @@ int main()
 		}
 		else
 			std::cout << "Nie ma cyklu Hamiltona w tym grafie!" << std::endl;
+	}
+
+	{
+		// Problem podzialu zbioru
+		std::cout << "Problem podzialu zbioru: " << std::endl;
+		size_t n = 20, maks = 14;
+		bool istnieje = true;
+		std::vector <int> liczby(n);
+		
+		for(size_t i = 0; i < n; i++)
+			std::cout << (liczby[i] = rand() % (maks + 1)) << ' ';
+		std::cout << std::endl;
+
+		std::vector <bool> wynik = podzial_zbioru(liczby, istnieje);
+		if(istnieje)
+		{
+			std::cout << "Podzial:\nCzesc 1:" << std::endl;
+			for(size_t i = 0; i < n; i++)
+				if(wynik[i])
+					std::cout << liczby[i] << ' ';
+			std::cout << std::endl;
+
+			std::cout << "Podzial:\nCzesc 2:" << std::endl;
+			for(size_t i = 0; i < n; i++)
+				if(!wynik[i])
+					std::cout << liczby[i] << ' ';
+			std::cout << std::endl;
+		}
+		else
+			std::cout << "Nie istnieje podzial tego zbioru" << std::endl;
 	}
 
 	///
