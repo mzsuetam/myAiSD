@@ -102,7 +102,6 @@ class Permutations
 	size_t n;
 
 public:
-
 	Permutations(size_t _n) : n(_n)
 	{
 		perms.resize(n);
@@ -134,22 +133,23 @@ public:
 	}
 };
 
-std::vector <int> komiwojazer( GraphMatrixBased& graph, int& _min_distance ){
+std::vector<int> komiwojazer(const GraphMatrixBased &graph, int &_min_distance)
+{
 	int min_distance = INT_MAX;
-	std::vector <int> min_cycle;
+	std::vector<int> min_cycle;
 
-	Permutations permutacja( graph.getSize() );
+	Permutations permutacja(graph.getSize());
 	do
 	{
-		std::vector <int> P = permutacja.getPermutation();
-		//std::cout << static_cast<std::string>(permutacja) << std::endl;
-		int sum=0;
+		std::vector<int> P = permutacja.getPermutation();
+		// std::cout << static_cast<std::string>(permutacja) << std::endl;
+		int sum = 0;
 		for (size_t i = 0; i < P.size() - 1; i++)
 		{
 			sum += graph.getWeight(P[i], P[i + 1]);
 		}
 		sum += graph.getWeight(P[P.size() - 1], P[0]);
-		if ( sum < min_distance )
+		if (sum < min_distance)
 		{
 			min_cycle = P;
 			min_distance = sum;
@@ -158,7 +158,47 @@ std::vector <int> komiwojazer( GraphMatrixBased& graph, int& _min_distance ){
 	while (permutacja.nextPermutation());
 
 	_min_distance = min_distance;
-	return min_cycle;	
+	return min_cycle;
+}
+
+std::vector<int> problem_kliki(const GraphMatrixBased &graph, int k)
+{
+	std::vector<int> wynik;
+	size_t n = graph.getSize();
+	SubSets podzbior(n, k);
+
+	do
+	{
+		long long p = podzbior.getSubset();
+		bool czy_dobry = true;
+
+		for (size_t i = 0; i < n && czy_dobry; i++)
+		{
+			if (p & (1 << i))
+			{
+				for (size_t j = 0; j < n && czy_dobry; j++)
+				{
+					if (i != j && !graph.getExists(i, j) && (p & (1 << j)))
+					{
+						czy_dobry = false;
+						break;
+					}
+				}
+			}
+		}
+
+		if (czy_dobry)
+		{
+			for (size_t i = 0; i < n; i++)
+				if (p & (1 << i))
+					wynik.push_back(i);
+
+			return wynik;
+		}
+	}
+	while (podzbior.nextSubSet());
+
+	return wynik;
 }
 
 int main()
@@ -166,26 +206,42 @@ int main()
 	// Generowanie wszystkich podzbiorów (ten nie jest NP):
 	std::cout << "Podzbiory:" << std::endl;
 	SubSets zbior(5, 2);
-	do { std::cout << static_cast <std::string> (zbior) << '\n'; }	
-	while(zbior.nextSubSet());
-
-
-	// Problem komiwojażera
-
-	std::cout << "Komiwojażer:" << std::endl;
-	GraphMatrixBased graph;
-	graph.makeTemplateFull();
-	graph.printGraph("18_komiwojażer");
-	int dist;
-	std::vector<int> min_cycle = komiwojazer(graph, dist);
-	for(size_t i = 0; i < min_cycle.size(); i++)
+	do
 	{
-		std::cout << min_cycle[i] << "->";
+		std::cout << static_cast<std::string>(zbior) << '\n';
 	}
-	std::cout << min_cycle[0] << " dist: " << dist << std::endl;
-	
-	
-	
+	while (zbior.nextSubSet());
+
+	{
+		// Problem komiwojażera
+		std::cout << "Komiwojażer:" << std::endl;
+		GraphMatrixBased graph;
+		graph.makeTemplateFull();
+		graph.printGraph("18_komiwojażer");
+		int dist;
+		std::vector<int> min_cycle = komiwojazer(graph, dist);
+		for (size_t i = 0; i < min_cycle.size(); i++)
+		{
+			std::cout << min_cycle[i] << "->";
+		}
+		std::cout << min_cycle[0] << " dist: " << dist << std::endl;
+	}
+
+	{
+		// Problem podkliki
+		std::cout << "Problem kliki:" << std::endl;
+		GraphMatrixBased graph;
+		graph.makeTemplate();
+		graph.makeNotDirected();
+		graph.printGraph("18_klika");
+
+		std::vector <int> klika = problem_kliki(graph, 4);
+
+		for(size_t i = 0; i < klika.size(); i++)
+			std::cout << klika[i] << ' ';
+		std::cout << std::endl;
+	}
+
 	///
 	return 0;
 }
