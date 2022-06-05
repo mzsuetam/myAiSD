@@ -69,7 +69,7 @@ public:
 		for (size_t i=0; i<matrix.size(); i++ ){
 			for (size_t j=0; j<i; j++ ){ 
 				matrix[j][i].weight =	matrix[i][j].weight = i*j + i + 1;
-				std::cout << i << j << ": " << matrix[i][j].from << "--" << matrix[i][j].to << " [w=" << matrix[i][j].weight <<"]"<< std::endl;
+				//std::cout << i << j << ": " << matrix[i][j].from << "--" << matrix[i][j].to << " [w=" << matrix[i][j].weight <<"]"<< std::endl;
 			}
 		}
 	}
@@ -141,6 +141,10 @@ public:
 
 	size_t getSize(){
 		return matrix.size();
+	}
+
+	int getWeight(size_t x, size_t y){
+		return matrix[x][y].weight;
 	}
 
 private:

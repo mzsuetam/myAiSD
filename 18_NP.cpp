@@ -89,7 +89,7 @@ public:
 		std::string value = "";
 
 		for (size_t i = 0; i < size; i++)
-			value += (sub_set & (1ll << i)) ? '1' : ' ';
+			value += (sub_set & (1ll << i)) ? '1' : '-';
 
 		return value;
 	}
@@ -134,32 +134,58 @@ public:
 	}
 };
 
-std::string komiwojazer( GraphMatrixBased& graph ){
+std::vector <int> komiwojazer( GraphMatrixBased& graph, int& _min_distance ){
 	int min_distance = INT_MAX;
+	std::vector <int> min_cycle;
 
 	Permutations permutacja( graph.getSize() );
 	do
 	{
-		
+		std::vector <int> P = permutacja.getPermutation();
+		//std::cout << static_cast<std::string>(permutacja) << std::endl;
+		int sum=0;
+		for (size_t i = 0; i < P.size() - 1; i++)
+		{
+			sum += graph.getWeight(P[i], P[i + 1]);
+		}
+		sum += graph.getWeight(P[P.size() - 1], P[0]);
+		if ( sum < min_distance )
+		{
+			min_cycle = P;
+			min_distance = sum;
+		}
 	}
 	while (permutacja.nextPermutation());
+
+	_min_distance = min_distance;
+	return min_cycle;	
 }
 
 int main()
 {
 	// Generowanie wszystkich podzbiorów (ten nie jest NP):
-	SubSets zbior(10, 2);
 	std::cout << "Podzbiory:" << std::endl;
+	SubSets zbior(5, 2);
 	do { std::cout << static_cast <std::string> (zbior) << '\n'; }	
 	while(zbior.nextSubSet());
 
 
 	// Problem komiwojażera
 
+	std::cout << "Komiwojażer:" << std::endl;
 	GraphMatrixBased graph;
 	graph.makeTemplateFull();
 	graph.printGraph("18_komiwojażer");
-
+	int dist;
+	std::vector<int> min_cycle = komiwojazer(graph, dist);
+	for(size_t i = 0; i < min_cycle.size(); i++)
+	{
+		std::cout << min_cycle[i] << "->";
+	}
+	std::cout << min_cycle[0] << " dist: " << dist << std::endl;
+	
+	
+	
 	///
 	return 0;
 }
