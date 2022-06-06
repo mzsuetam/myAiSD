@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-class List{
+class LinkedList{
 	// z dowiązaniami, które pozwalają nie martwić się o warunki brzegowe
 	struct Node
 	{
@@ -15,8 +15,8 @@ class List{
 	
 public:
 
-	List(){_init();}
-	~List(){
+	LinkedList(){_init();}
+	~LinkedList(){
 		Node* ptr = warder->n;
 		while ( ptr != warder ) {
 			Node* next = ptr->n;
@@ -56,7 +56,7 @@ public:
 			return tmp;
 		}
 		else{
-			std::cout << "Error: List empty!" << std::endl;
+			std::cout << "Error: LinkedList empty!" << std::endl;
 			return 0;
 		}	
 	}
@@ -75,7 +75,7 @@ public:
 	}
 
 	void print(){
-		std::cout << "List: ";
+		std::cout << "LinkedList: ";
 		Node* ptr = warder->n;
 		while ( ptr != warder ) {
 			std::cout << ptr->val << " ";
@@ -88,7 +88,7 @@ public:
 
 
 int main(void){
-	List queue1;
+	LinkedList queue1;
 
 	std::cout << queue1.pop(3) << std::endl;
 	queue1.print();

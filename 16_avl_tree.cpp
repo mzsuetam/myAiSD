@@ -121,14 +121,18 @@ private:
 				//	of the left sub-tree of the critical node.
 				//std::cout << "LR" << std::endl;
 				_rotateLeft(c->left); // wyrzucamy wagę ze środka na lewo
+				//_setHeight(c->right->p);
 				_rotateRight(c);
+				//_setHeight(c->p);
 			}
 			else if ( balance < -1 && c->right && z->key < c->right->key ){
 				// RL Rotation - The new node is inserted to the left sub-tree
 				//	of the right sub-tree of the critical node.
 				//std::cout << "RL" << std::endl;
 				_rotateRight(c->right); // wyrzucamy wagę ze środka na prawo
+				//_setHeight(c->right->p);
 				_rotateLeft(c);
+				//_setHeight(c->p);
 			}
 			// do else nigdy nie dochodzi
 		}

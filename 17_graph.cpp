@@ -441,7 +441,7 @@ public:
 
 	std::vector< std::vector<int> > Ford_Fulkerson(int start, int end){ 
 		// Znajdowanie maksymalnego przepływu w sieci przepływowej. 
-		//	Złożoność: O( E*f_max ) : f_max - maksymalny przepływ w grafie
+		//	Złożoność: O( (V+E)*f_max ) : f_max - maksymalny przepływ w grafie
 		std::cout << "Ford-Fulkerson algorithm" << std::endl;
 		std::vector< std::vector<int> > flow_matrix;
 		std::vector< bool > visited;
@@ -469,7 +469,7 @@ public:
 
 	void printGraph(std::string name = "graph"){
 		// http://graphviz.org/doc/info/command.html
-		// program.out | dot -Tsvg > output.svg
+		// "opis grafu" | dot -Tsvg > output.svg
 		graph_type type = GRAPH;
 
 		for ( size_t i=0; i < matrix.size() && type==GRAPH; i++){
