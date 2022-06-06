@@ -4,6 +4,7 @@
 
 #define DONT_INCLUDE_MAIN
 #include "17_graph.cpp"
+#include "lib/timer.h"
 
 class SubSets
 {
@@ -69,9 +70,9 @@ public:
 					break;
 				}
 
-				if (sub_set & (1ll << i))
+				if (sub_set & (1ll << i)) 
 				{
-					sub_set |= (1ll << ile_jedynek);
+					sub_set |= (1ll << ile_jedynek); 
 					if (ile_jedynek != i)
 						sub_set ^= (1ll << i);
 					ile_jedynek++;
@@ -135,6 +136,7 @@ public:
 
 std::vector<int> komiwojazer(const GraphMatrixBased &graph, int &_min_distance)
 {
+	// Znalezienie minimalnego cyklu Hamiltona w pełnym grafie ważonym
 	int min_distance = INT_MAX;
 	std::vector<int> min_cycle;
 
@@ -162,19 +164,20 @@ std::vector<int> komiwojazer(const GraphMatrixBased &graph, int &_min_distance)
 }
 
 std::vector<int> problem_kliki(const GraphMatrixBased &graph, int k)
-{
+{ 
+	// Stwierdzenie, czy w danym grafie istnieje klika o podanym rozmiarze k
 	std::vector<int> wynik;
 	size_t n = graph.getSize();
 	SubSets podzbior(n, k);
 
-	do
+	do // przechodzimy się po podzbiorach o wielkości k
 	{
 		long long p = podzbior.getSubset();
 		bool czy_dobry = true;
 
-		for (size_t i = 0; i < n && czy_dobry; i++)
-			if (p & (1 << i))
-				for (size_t j = 0; j < n && czy_dobry; j++)
+		for (size_t i = 0; i < n && czy_dobry; i++) // przejście po wierzchołkach w grafie
+			if (p & (1 << i)) // czy wierzchołek jest w podzbiorze
+				for (size_t j = 0; j < n && czy_dobry; j++) // prejście po wierzchołkach 
 					if (i != j && !graph.getExists(i, j) && (p & (1 << j)))
 						czy_dobry = false;
 
@@ -194,6 +197,9 @@ std::vector<int> problem_kliki(const GraphMatrixBased &graph, int k)
 
 std::vector <int> pokrycie_wierzcholkowe(const GraphMatrixBased &graph, int k)
 {
+	// Znalezie nie pokrycia wierzchołkowego o wielkości k 
+	// Pokrycie wierzchołkowe grafu G to taki podzbiór wierzchołków G,
+	//	że każda krawędź G jest incydentna do jakiegoś wierzchołka z tego podzbioru
 	std::vector<int> wynik;
 	size_t n = graph.getSize();
 	SubSets podzbior(n, k);
@@ -233,7 +239,7 @@ std::vector <int> cykl_Hamiltona(const GraphMatrixBased &graph)
 		const std::vector<int> &perm_v = perm.getPermutation();
 		bool czy_dobry = true;
 
-		for(int i = 0; i < n - 1 && czy_dobry; i++)
+		for(size_t i = 0; i < n - 1 && czy_dobry; i++)
 			if(!graph.getExists(perm_v[i], perm_v[i + 1]))
 				czy_dobry = false;
 		if(!graph.getExists(perm_v[n - 1], perm_v[0]))
@@ -254,7 +260,7 @@ std::vector <bool> podzial_zbioru(const std::vector <int> &liczby, bool &istniej
 
 	istnieje = false;
 
-	for(size_t i = 0; i < n; i++)
+	for(int i = 0; i < n; i++)
 		suma += liczby[i];
 	
 	if(suma % 2 == 1)
@@ -265,7 +271,7 @@ std::vector <bool> podzial_zbioru(const std::vector <int> &liczby, bool &istniej
 		long long p = podzbior.getSubset();
 		int suma_t = 0;
 
-		for(size_t i = 0; i < n; i++)
+		for(int i = 0; i < n; i++)
 			if(p & (1 << i))
 				suma_t += liczby[i];
 		
@@ -273,7 +279,7 @@ std::vector <bool> podzial_zbioru(const std::vector <int> &liczby, bool &istniej
 		{
 			std::vector <bool> wynik(n);
 
-			for(size_t i = 0; i < n; i++)
+			for(int i = 0; i < n; i++)
 				wynik[i] = p & (1 << i);
 
 			istnieje = true;
@@ -291,7 +297,7 @@ std::vector <bool> podzial_zbioru_dynamiczny_plecak(const std::vector <int> &lic
 
 	istnieje = false;
 
-	for(size_t i = 0; i < n; i++)
+	for(int i = 0; i < n; i++)
 		suma += liczby[i];
 	
 	if(suma % 2 == 1)
@@ -300,7 +306,7 @@ std::vector <bool> podzial_zbioru_dynamiczny_plecak(const std::vector <int> &lic
 	int oczekiwana_suma = suma / 2;
 
 	std::vector <std::vector<int>> plecak(n + 1);
-	for(size_t i = 0; i <= n; i++)
+	for(int i = 0; i <= n; i++)
 		plecak[i].resize(oczekiwana_suma + 1);
 
 	for(int i = 0; i <= n; i++)
@@ -360,6 +366,7 @@ int main()
 
 	{
 		// Problem komiwojażera
+		std::cout << std::endl;
 		std::cout << "Komiwojażer:" << std::endl;
 		GraphMatrixBased graph;
 		graph.makeTemplateFull();
@@ -375,7 +382,9 @@ int main()
 
 	{
 		// Problem podkliki
+		std::cout << std::endl;
 		std::cout << "Problem kliki:" << std::endl;
+		// czy w danym grafie istnieje klika o podanym rozmiarze k
 		GraphMatrixBased graph;
 		graph.makeTemplate();
 		graph.makeNotDirected();
@@ -397,6 +406,7 @@ int main()
 
 	{
 		// Pokrycie wierzcholkowe
+		std::cout << std::endl;
 		std::cout << "Problem pokrycia wierzcholkowego:" << std::endl;
 		GraphMatrixBased graph;
 		graph.makeTemplate();
@@ -419,6 +429,7 @@ int main()
 
 	{
 		// Cykl Hamiltona
+		std::cout << std::endl;
 		std::cout << "Cykl Hamiltona: " << std::endl;
 		GraphMatrixBased graph;
 		graph.makeTemplate();
@@ -439,6 +450,7 @@ int main()
 
 	{
 		// Problem podzialu zbioru
+		std::cout << std::endl;
 		std::cout << "Problem podzialu zbioru:" << std::endl; // Mozna zrobic dla malych liczb szybciej dynamicznie (problem plecakowy)
 		size_t n = 64, maks = 1000;
 		bool istnieje = true;
@@ -478,6 +490,7 @@ int main()
 			std::cout << "Nie istnieje podzial tego zbioru" << std::endl;
 
 		// Dynamicznie
+		std::cout << std::endl;
 		std::cout << "Problem podzialu zbioru dynamicznie:" << std::endl;
 		wynik = podzial_zbioru_dynamiczny_plecak(liczby, istnieje);
 		if(istnieje)

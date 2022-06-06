@@ -64,7 +64,7 @@ void buildHeap(double tab[], int n){
 		_heapify(i);
 	}
 
-	std::cout << "MaxHeap has been builded from table." << std::endl; 
+	std::cout << "MaxHeap has been built from table." << std::endl; 
 }
 
 void insert(double val){

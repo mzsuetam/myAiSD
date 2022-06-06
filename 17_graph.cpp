@@ -145,7 +145,8 @@ public:
 		return matrix.size();
 	}
 
-	int getWeight(size_t x, size_t y) const{
+	int getWeight(size_t x, size_t y) const
+	{ 
 		return matrix[x][y].weight;
 	}
 
@@ -181,6 +182,7 @@ private:
 
 public:
 	void DFS(int start){
+		// Depth-first Search
 		std::cout << "DFS" << std::endl;
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
@@ -189,6 +191,7 @@ public:
 	}	
 
 	void BFS(int start)	{
+		// Breadth-first search
 		std::cout << "BFS" << std::endl;
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
@@ -206,7 +209,7 @@ public:
 			int v = for_visit.front();
 			for_visit.pop();
 
-			for (size_t i=0;  i<matrix.size(); i++){
+			for (size_t i=0; i<matrix.size(); i++){
 				if ( matrix[v][i].exist && !visited[i] ){
 					visited[i] = true;
 					predecesors[i] = v;
@@ -224,6 +227,8 @@ public:
 
 	std::vector<int> topologicalSort(){
 		std::cout << "Topological Sort" << std::endl;
+		// liniowe uporządkowanie wierzchołków tak, aby dla każdej pary wierzchołków x i y:
+		//	istnieje krawędź z x do y => x był przed y
 		std::vector<bool> visited( matrix.size() );
 		visited.assign(matrix.size(),false);
 		std::queue<int> order;
@@ -241,8 +246,9 @@ public:
 	}
 
 	std::vector<int>/*poprzedników*/ Prim(){
-		// zwraca minimalne drzewo rozpinające
+		// zwraca minimalne drzewo rozpinające w grafie nieskierowanym i spójnym
 		// Złożonośc O( (V+E)*log_2(V) )
+
 		std::cout << "Prim algorithm" << std::endl;
 		std::priority_queue<Edge> Q;
 		std::vector<bool> visited( matrix.size() );
@@ -290,6 +296,10 @@ public:
 	}
 
 	std::vector<int> Bellman_Ford( int start, bool& exist_negative_cycle ){
+		// Wyszukiwanie najkrótszych ścieżek w grafie ważonym z wierzchołka źródłowego
+		//	do wszystkich pozostałych wierzchołków. Działa również dla ujemnych wag krawędzi,
+		// (nie może jednak wystąpić cykl o łącznej ujemnej wadze osiągalny ze źródła)
+
 		// Złożoność dla listy sąsiedztwa: O( V*E ) 
 		// Nasza złożoność: O( V^3 ) (XD)
 
@@ -304,8 +314,8 @@ public:
 		}
 		distance[start] = 0;
 
-		for (size_t i=0; i<matrix.size() -1; i++ ){
-			// przejście po wszystkich istniejących krawędziach
+		for (size_t i=0; i<matrix.size() -1; i++ ){ // przejście po wierzchołkach
+			// przejście po wszystkich istniejących krawędziach:
 			for (size_t j=0; j<matrix.size(); j++ ){
 				for (size_t k=0; k<matrix.size(); k++ ){
 					if ( matrix[j][k].exist ){
@@ -314,7 +324,7 @@ public:
 				}
 			}
 		}
-
+ 		//Działa również dla ujemnych krawędzi,
 		exist_negative_cycle = false;
 		for (size_t i=0; i<matrix.size(); i++ ){
 			for (size_t j=0; j<matrix.size(); j++ ){
@@ -329,7 +339,8 @@ public:
 	}
 
 	std::vector<int> Dijkstra( int start ){ // to się czyta "Dajkstra" :)
-		// zwraca odległości pomiędzy startem a każdym innym wierzchołkiem
+		// wyszukiwani najkrótszych ścieżek w grafie ważonym (o wagach nieujemnych) z wierzchołka źródłowego
+		//	do wszystkich pozostałych wierzchołków.
 		// Złożonośc O( (V+E)*log_2(V) )
 		std::cout << "Dijkstra algorithm" << std::endl;
 		struct Pair{
@@ -369,8 +380,10 @@ public:
 	}
 
 	std::vector< std::vector< int > > Floyd_Warshall(){
+		// Zwraca najkrótsze ścieżki między każdymi 2 wierzchołkami
+		// Działa również dla ujemnych krawędzi,
+		// (nie może jednak wystąpić cykl o łącznej ujemnej wadze osiągalny ze źródła)
 		std::cout << "Floyd-Warshall algorithm" << std::endl;
-		// zwraca najkrótsze ścieżki między każdymi wierzchołkami
 		// Złożoność O ( n^3 )
 		std::vector< std::vector< int > > distance_matrix;
 		std::vector< std::vector< int > > predecesors_matrix;
@@ -407,19 +420,14 @@ public:
 	}
 
 	int Ford_Fulkerson_DFS( std::vector< std::vector<int> >& flow_matrix, std::vector<bool>& visited, int v, int end, int min_flow){
-		//std::cout << "FF_DFS " << matrix.size() << std::endl;
 		visited[v] = true;
 		if ( v == end ) return min_flow;
 		for (size_t i=0; i<matrix.size(); i++){
-			//std::cout << "for1" << std::endl;
 			if ( matrix[v][i].exist && !visited[i] ){
-				//std::cout << "if1" << std::endl;
 				int flow_left = matrix[v][i].weight - flow_matrix[v][i];
 				if ( flow_left > 0 ){
-					//std::cout << "if2" << std::endl;
 					int new_flow = Ford_Fulkerson_DFS(flow_matrix, visited, i, end, std::min(flow_left,min_flow));
 					if ( new_flow ){ // znaleźliśmy jakiś przepływ
-						//std::cout << "if3" << std::endl;
 						flow_matrix[v][i] += new_flow;
 						flow_matrix[i][v] -= new_flow;
 						return new_flow;
@@ -431,7 +439,9 @@ public:
 		return 0;
 	}
 
-	std::vector< std::vector<int> > Ford_Fulkerson(int start, int end){ // maksymalny przepływ
+	std::vector< std::vector<int> > Ford_Fulkerson(int start, int end){ 
+		// Znajdowanie maksymalnego przepływu w sieci przepływowej. 
+		//	Złożoność: O( E*f_max ) : f_max - maksymalny przepływ w grafie
 		std::cout << "Ford-Fulkerson algorithm" << std::endl;
 		std::vector< std::vector<int> > flow_matrix;
 		std::vector< bool > visited;
@@ -509,7 +519,7 @@ int main(){
 	GraphMatrixBased graph;
 	//graph.makeTemplate();
 	graph.makeTemplateWithoutCycles();
-	graph.printGraph("17_graph_without_cycles");
+	graph.printGraph("17_DFS_BFS_topologicalSort");
 
 
 	// PODSTAWOWE ALGORYTMY GRAFOWE:
@@ -517,6 +527,7 @@ int main(){
 	graph.DFS(0);
 
 	graph.BFS(0);
+
 	{
 		std::vector<int> out = graph.topologicalSort();
 		for (size_t i=0; i<out.size(); i++){
@@ -529,17 +540,18 @@ int main(){
 	{
 		GraphMatrixBased g2 = graph;
 		g2.makeNotDirected();
-		//graph.print(GraphMatrixBased::GRAPH);
+		g2.printGraph("17_Prim_in");
 		std::vector<int> out = g2.Prim();
 		for (size_t i=0; i<out.size(); i++){
 			std::cout << out[i] << " ";
 		}
 		std::cout << std::endl;
+		GraphMatrixBased drzewoRozpinające(out);
+		drzewoRozpinające.printGraph("17_Prim_out");
 	}
 
 	// NAJKRÓTSZE ŚCIEŻKI Z 1 ŹRÓDŁEM:
 	{
-		//graph.print(GraphMatrixBased::DIGRAPH);
 
 		bool exist_negative_cycle;
 		std::vector<int> out = graph.Bellman_Ford(0,exist_negative_cycle);
@@ -553,7 +565,7 @@ int main(){
 			std::cout << ( (out2[j]!=INF) ? out2[j] : -1 ) << " ";
 		}
 		GraphMatrixBased dji_graph(out2);
-		dji_graph.printGraph("17_dji_graph");
+		dji_graph.printGraph("17_djikstra");
 		std::cout << std::endl;
 
 	}
@@ -561,7 +573,6 @@ int main(){
 	// NAJKRÓTSZE ŚCIEŻKI MIĘDZY WSZYSTKIMI PARAMI WIERZCHOŁKÓW
 	{
 		// *tego na kolosie nie będzie
-		//graph.print(GraphMatrixBased::GRAPH);
 		std::vector< std::vector<int> > out = graph.Floyd_Warshall();
 		for (size_t i=0; i<out.size(); i++){
 			for (size_t j=0; j<out.size(); j++){
@@ -575,8 +586,8 @@ int main(){
 
 	// MAKSYMALNY PRZEPŁYW:
 	{
-		graph.makeNotDirected();
-		graph.printGraph("17_graph_not_directed");
+		//graph.makeNotDirected();
+		graph.printGraph("17_flow");
 
 		std::vector< std::vector<int> > out = graph.Ford_Fulkerson(0,9);
 		//std::cout << out.size() <<  std::endl;	
@@ -586,7 +597,7 @@ int main(){
 			}
 			std::cout << std::endl;
 		}
-		std::cout <<  std::endl;	
+		std::cout <<  std::endl;
 	}
 
 	return 0;

@@ -76,7 +76,7 @@ void buildHeap(double values[], int keys[], int n){
 		_heapify(i);
 	}
 
-	std::cout << "PriorityQueue has been builded from tables." << std::endl; 
+	std::cout << "PriorityQueue has been built from tables." << std::endl; 
 }
 
 void insert(double val, int key){

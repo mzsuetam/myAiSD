@@ -146,17 +146,17 @@ private:
 		// tmp = korzen; //tmp to zmienna tymczasowa
 		// while tmp nie jest równe NULL
 		// 	if tmp posiada lewego potomka
-		// 		wykonaj rotację tego potomka względem tmp; //Czyli lewy potomek zostaje ojcem węzła tmp
+		// 		wykonaj rotację w prawo tego potomka względem tmp; //Czyli lewy potomek zostaje ojcem węzła tmp
 		// 		tmp zostaje przesunięty do nowo powstałego rodzica;
 		// 	else
 		// 		tmp zostaje przesunięty w miejsce swojego prawego potomka;
 
 		// FAZA II - tworzneie AVL
 		// m = 2^[log_2(n+1)-1]; / [x] oznacza funkcję entier – największą liczbę całkowitą, nie większą od x
-		// wykonaj n-m rotacji, idąc od początku linii po prawych potomkach;
+		// wykonaj n-m rotacji w lewo, idąc od początku linii po prawych potomkach;
 		// while m > 1
 		// 	m = [m/2]; // znaczenie nawiasów [] jak wyżej
-		// 	wykonaj m rotacji, idąc od początku linii po prawych potomkach;
+		// 	wykonaj m rotacji w lewo, idąc od początku linii po prawych potomkach;
 
 	}
 
